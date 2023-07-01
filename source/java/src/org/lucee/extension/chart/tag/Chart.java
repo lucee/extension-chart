@@ -22,6 +22,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Rectangle;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -201,6 +203,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	private String source;
 	private List<String> _plotItemLables = new ArrayList<String>();
 	private Color color=Color.BLACK;
+	private int markerStyle = ChartSeriesBean.MARKER_STYLE_RECTANGLE;
 	
 	public void release() {
 		super.release();
@@ -258,6 +261,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		tipstyle=TIP_STYLE_MOUSEOVER;
 		_plotItemLables = new ArrayList<String>();
 		color=Color.BLACK;
+		markerStyle = ChartSeriesBean.MARKER_STYLE_RECTANGLE;
 	}
 	
 	public void setShowxlabel(boolean showXLabel) {
@@ -475,7 +479,6 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		//if(_series.size()>1) throw new ApplicationException("only one cfchartseries tag allowed inside cfchart"); 
 		//doSingleSeries((ChartSeriesBean) _series.get(0));
 		ChartSeriesBean first= _series.get(0);
-		
 		try {
 				
 			if(first.getType()==ChartSeriesBean.TYPE_BAR)
@@ -1001,9 +1004,14 @@ public final class Chart extends BodyTagImpl implements Serializable {
 				
 				int seriesCount=_series.size();
 				for(int i=0;i<seriesCount;i++){
+					markerStyle = _series.get(i).getMarkerStyle();
 					xyr.setSeriesShapesVisible(i, true);
 					xyr.setSeriesItemLabelsVisible(i, true);
-					xyr.setSeriesShape(i, ShapeUtilities.createDiamond(markersize));
+					if(markerStyle == ChartSeriesBean.MARKER_STYLE_CIRCLE) xyr.setSeriesShape(i, new Ellipse2D.Double(-markersize/2,-markersize/2,markersize,markersize));
+					else if( markerStyle == ChartSeriesBean.MARKER_STYLE_TRIANGLE) xyr.setSeriesShape(i, ShapeUtilities.	createUpTriangle(markersize));
+					else if(markerStyle == ChartSeriesBean.MARKER_STYLE_DIAMOND) xyr.setSeriesShape(i, ShapeUtilities.createDiamond(markersize));
+					else if(markerStyle == ChartSeriesBean.MARKER_STYLE_MCROSS || markerStyle == ChartSeriesBean.MARKER_STYLE_RCROSS) xyr.setSeriesShape(i, ShapeUtilities.createDiagonalCross(markersize, 1));
+					else xyr.setSeriesShape(i, new Rectangle2D.Double(-markersize/2,-markersize/2,markersize,markersize));
 					xyr.setUseFillPaint(true);
 					xyr.setBaseFillPaint(databackgroundcolor);
 				}
@@ -1017,9 +1025,14 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			
 				int seriesCount=_series.size();
 				for(int i=0;i<seriesCount;i++){
+					markerStyle = _series.get(i).getMarkerStyle();
 					lsr.setSeriesShapesVisible(i, true);
 					lsr.setSeriesItemLabelsVisible(i, true);
-					lsr.setSeriesShape(i, ShapeUtilities.createDiamond(markersize));
+					if(markerStyle == ChartSeriesBean.MARKER_STYLE_CIRCLE) lsr.setSeriesShape(i, new Ellipse2D.Double(-markersize/2,-markersize/2,markersize,markersize));
+					else if( markerStyle == ChartSeriesBean.MARKER_STYLE_TRIANGLE) lsr.setSeriesShape(i, ShapeUtilities.	createUpTriangle(markersize));
+					else if(markerStyle == ChartSeriesBean.MARKER_STYLE_DIAMOND) lsr.setSeriesShape(i, ShapeUtilities.createDiamond(markersize));
+					else if(markerStyle == ChartSeriesBean.MARKER_STYLE_MCROSS || markerStyle == ChartSeriesBean.MARKER_STYLE_RCROSS) lsr.setSeriesShape(i, ShapeUtilities.createDiagonalCross(markersize, 1));
+					else lsr.setSeriesShape(i, new Rectangle2D.Double(-markersize/2,-markersize/2,markersize,markersize));
 			        lsr.setUseFillPaint(true);
 			        lsr.setBaseFillPaint(databackgroundcolor);
 				}
