@@ -36,8 +36,7 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 				var info = imageInfo( img );
 				expect ( info.height ).toBe( 200 );
 				expect ( info.width ).toBe( 300 );
-				var imgFile = getTempFile(prefix="base64ChartAsName", ext="png");
-				debug(img);
+				var imgFile = getTempFile(dir=getTempDirectory(), prefix="base64ChartAsName", ext="png");
 				ImageWrite( img, imgFile );
 			});
 
