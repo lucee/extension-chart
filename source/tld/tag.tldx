@@ -3,11 +3,11 @@
 <taglib>
 	<tlib-version>1.0</tlib-version>
 	<cfml-version>1.0</cfml-version>
-	<short-name>pdf-extension</short-name>
-	<uri>http://extension.lucee.org/tag/pdf</uri>
-	<display-name>PDF</display-name>
+	<short-name>chart-extension</short-name>
+	<uri>http://extension.lucee.org/tag/chart</uri>
+	<display-name>Chart</display-name>
 	<description>
-		Tags to interact with PDF
+		Tags to interact with Charts
 	</description>
 	<name-space>cf</name-space>
 	<name-space-separator></name-space-separator>
@@ -24,6 +24,10 @@
 		<body-rtexprvalue>false</body-rtexprvalue>
 		<description>Generates and displays a chart.</description>
 		<attribute-type>fixed</attribute-type>
+		<script>
+			<type>multiple</type>
+			<rtexprvalue>false</rtexprvalue>
+		</script>
 		<attribute>
 			<type>string</type>
 			<name>backgroundColor</name>
@@ -354,6 +358,10 @@
 		<body-rtexprvalue>false</body-rtexprvalue>
 		<description>Used with the cfchart and cfchartseries tags. This tag defines chart data points. Its data is submitted to the cfchartseries tag. </description>
 		<attribute-type>fixed</attribute-type>
+		<script>
+			<type>multiple</type>
+			<rtexprvalue>false</rtexprvalue>
+		</script>
 		<attribute>
 			<type>string</type>
 			<name>item</name>
@@ -376,6 +384,10 @@
 		<tte>parent:chart</tte>
 		<body-content>free</body-content>
 		<body-rtexprvalue>false</body-rtexprvalue>
+		<script>
+			<type>multiple</type>
+			<rtexprvalue>false</rtexprvalue>
+		</script>
 		<description>Used with the cfchart and cfchartseries tags. This tag defines chart data points. Its data is submitted to the cfchartseries tag. </description>
 		<attribute-type>fixed</attribute-type>
 		<attribute>
