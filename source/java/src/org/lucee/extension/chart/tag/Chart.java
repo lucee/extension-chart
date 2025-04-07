@@ -4,17 +4,17 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either 
+ * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
+ *
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  **/
 package org.lucee.extension.chart.tag;
 
@@ -101,12 +101,12 @@ import org.jfree.util.ShapeUtilities;
 
 public final class Chart extends BodyTagImpl implements Serializable {
 
-	
-	
+
+
 	public static final Color COLOR_999999=new Color(0x99,0x99,0x99);
 	public static final Color COLOR_666666=new Color(0x66,0x66,0x66);
 	public static final Color COLOR_333333=new Color(0x33,0x33,0x33);
-	
+
 	public static final String FONT_ARIAL = "arial";
 	public static final String FONT_TIMES = "times";
 	public static final String FONT_COURIER = "courier";
@@ -120,7 +120,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 	public static final int PIE_SLICE_STYLE_SOLID = 0;
 	public static final int PIE_SLICE_STYLE_SLICED = 1;
-	
+
 	public static final int SERIES_PLACEMENT_DEFAULT = 0;
 	public static final int SERIES_PLACEMENT_CLUSTER = 1;
 	public static final int SERIES_PLACEMENT_STACKED = 2;
@@ -130,7 +130,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	public static final int TIP_STYLE_FORMATS = 1;
 	public static final int TIP_STYLE_MOUSEDOWN = 2;
 	public static final int TIP_STYLE_MOUSEOVER = 3;
-	
+
 	public static final CategoryLabelPositions LABEL_HORIZONTAL = CategoryLabelPositions.STANDARD;
 	public static final CategoryLabelPositions LABEL_VERTICAL = CategoryLabelPositions.DOWN_90;
 	public static final CategoryLabelPositions LABEL_DOWN_90 = CategoryLabelPositions.DOWN_90;
@@ -141,40 +141,40 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	private static final int NONE = 0;
 	private static final int YES = 1;
 	private static final int NO = 2;
-	
+
 
 	private static int chartIndex=0;
-	
+
 	private Color backgroundcolor=Color.WHITE;
 	private Color databackgroundcolor=Color.WHITE;
 	private Color foregroundcolor=Color.BLACK;
 	private Color tipbgcolor=Color.WHITE;
 	private String xaxistitle=null;
 	private String yaxistitle=null;
-	
+
 
 	private int chartheight=240;
 	private int chartwidth=320;
-	
+
 	private String font=FONT_ARIAL;
 	private int fontstyle=0;
 	private int fontsize=11;
-	
+
 	private int format=FORMAT_PNG;
 	private int gridlines=10;
-	
+
 	private int labelFormat=LabelFormatUtil.LABEL_FORMAT_NUMBER;
 	private CategoryLabelPositions labelPosition=LABEL_HORIZONTAL;
 	private int markersize=-1;
-	
+
 	private String name=null;
-	
+
 	private int pieslicestyle=PIE_SLICE_STYLE_SLICED;
 
 	private double scalefrom=Double.NaN;
 	private double scaleto=Double.NaN;
 	private boolean legendMultiLine=false;
-	
+
 	private int seriesplacement=SERIES_PLACEMENT_DEFAULT;
 
 	private boolean show3d=false;
@@ -188,7 +188,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 	private String style=null;
 	private String title="";
-	
+
 	private int tipstyle=TIP_STYLE_MOUSEOVER;
 	private List<ChartSeriesBean> _series=new ArrayList<ChartSeriesBean>();
 
@@ -204,7 +204,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	private List<String> _plotItemLables = new ArrayList<String>();
 	private Color color=Color.BLACK;
 	private int markerStyle = ChartSeriesBean.MARKER_STYLE_RECTANGLE;
-	
+
 	public void release() {
 		super.release();
 		_series.clear();
@@ -214,7 +214,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		yoffset=0.1;
 		xaxistype="category";
 		yaxistype="category";
-				
+
 		xaxistitle="";
 		yaxistitle="";
 		legendMultiLine=false;
@@ -223,29 +223,29 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		databackgroundcolor=Color.WHITE;
 		foregroundcolor=Color.BLACK;
 		tipbgcolor=Color.WHITE;
-		
+
 		chartheight=240;
 		chartwidth=320;
-		
+
 		font=FONT_ARIAL;
 		fontstyle=0;
 		fontsize=11;
-		
+
 		format=FORMAT_PNG;
 		gridlines=10;
-		
+
 		labelFormat=LabelFormatUtil.LABEL_FORMAT_NUMBER;
 		labelPosition=LABEL_HORIZONTAL;
 
 		markersize=-1;
 		name=null;
-		
+
 		pieslicestyle=PIE_SLICE_STYLE_SLICED;
-		
+
 		scalefrom=Double.NaN;
 		scaleto=Double.NaN;
 		seriesplacement=SERIES_PLACEMENT_DEFAULT;
-		
+
 		show3d=false;
 		showborder=false;
 		showlegend=true;
@@ -263,7 +263,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		color=Color.BLACK;
 		markerStyle = ChartSeriesBean.MARKER_STYLE_RECTANGLE;
 	}
-	
+
 	public void setShowxlabel(boolean showXLabel) {
 		this.showXLabel = showXLabel;
 	}
@@ -287,7 +287,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	public void setBackgroundcolor(String strBackgroundColor) throws PageException {
 		this.backgroundcolor = eng().getCastUtil().toColor(strBackgroundColor);
 	}
-	
+
 	public void setDatabackgroundcolor(String strDatabackgroundcolor) throws PageException {
 		this.databackgroundcolor = eng().getCastUtil().toColor(strDatabackgroundcolor);
 	}
@@ -299,7 +299,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	public void setTipbgcolor(String strTipbgcolor) throws PageException {
 		this.tipbgcolor = eng().getCastUtil().toColor(strTipbgcolor);
 	}
-	
+
 	public void setChartheight(double chartheight) {
 		this.chartheight = (int) chartheight;
 	}
@@ -339,7 +339,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		else if("png".equals(strFormat))	format=FORMAT_PNG;
 		//else if("flash".equals(strFormat))	format=FORMAT_FLASH;
 		//else if("swf".equals(strFormat))	format=FORMAT_FLASH;
-		
+
 		else throw eng().getExceptionUtil().createApplicationException("invalid value ["+strFormat+"] for attribute format, for this attribute only the following values are supported [gif,jpg,png]");
 	}
 
@@ -355,7 +355,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		else if("date".equals(strLabelFormat))		labelFormat=LabelFormatUtil.LABEL_FORMAT_DATE;
 		else if("percent".equals(strLabelFormat))	labelFormat=LabelFormatUtil.LABEL_FORMAT_PERCENT;
 		//else if("integer".equals(strLabelFormat))	labelFormat=LabelFormatUtil.LABEL_FORMAT_INTEGER;
-		
+
 		else throw eng().getExceptionUtil().createApplicationException("invalid value ["+strLabelFormat+"] for attribute labelFormat, for this attribute only the following values are supported [date,percent,currency,number]");
 	}
 
@@ -373,7 +373,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		if("sliced".equals(strPieslicestyle))		pieslicestyle=PIE_SLICE_STYLE_SLICED;
 		else if("slice".equals(strPieslicestyle))	pieslicestyle=PIE_SLICE_STYLE_SLICED;
 		else if("solid".equals(strPieslicestyle))	pieslicestyle=PIE_SLICE_STYLE_SOLID;
-		
+
 		else eng().getExceptionUtil().createApplicationException("invalid value ["+strPieslicestyle+"] for attribute pieSliceStyle, for this attribute only the following values are supported [sliced,solid]");
 	}
 
@@ -393,7 +393,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		else if("cluster".equals(strSeriesplacement))seriesplacement=SERIES_PLACEMENT_CLUSTER;
 		else if("stacked".equals(strSeriesplacement))seriesplacement=SERIES_PLACEMENT_STACKED;
 		else if("percent".equals(strSeriesplacement))seriesplacement=SERIES_PLACEMENT_PERCENT;
-		
+
 		else throw eng().getExceptionUtil().createApplicationException("invalid value ["+strSeriesplacement+"] for attribute seriesplacement, for this attribute only the following values are supported [default,cluster,percent,stacked]");
 	}
 
@@ -444,12 +444,12 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		else if("mouseover".equals(strTipstyle))tipstyle=TIP_STYLE_MOUSEOVER;
 		else if("none".equals(strTipstyle))	   	tipstyle=TIP_STYLE_NONE;
 		else if("formats".equals(strTipstyle))	tipstyle=TIP_STYLE_FORMATS;
-		
+
 		else throw eng().getExceptionUtil().createApplicationException("invalid value ["+strTipstyle+"] for attribute Tipstyle, for this attribute only the following values are supported [mouseover,mousedown,one,formats]");
 	}
-	
 
-	
+
+
 	/**
 	 * @param xaxistitle the xaxistitle to set
 	 */
@@ -467,7 +467,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	public void addChartSeries(ChartSeriesBean series) {
 		_series.add(series);
 	}
-	
+
 
 	public int doStartTag()	{
 		return EVAL_BODY_INCLUDE;
@@ -475,12 +475,12 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 	@Override
 	public int doEndTag() throws PageException {
-		if(_series.size()==0) throw eng().getExceptionUtil().createApplicationException("at least one cfchartseries tag required inside cfchart"); 
-		//if(_series.size()>1) throw new ApplicationException("only one cfchartseries tag allowed inside cfchart"); 
+		if(_series.size()==0) throw eng().getExceptionUtil().createApplicationException("at least one cfchartseries tag required inside cfchart");
+		//if(_series.size()>1) throw new ApplicationException("only one cfchartseries tag allowed inside cfchart");
 		//doSingleSeries((ChartSeriesBean) _series.get(0));
 		ChartSeriesBean first= _series.get(0);
 		try {
-				
+
 			if(first.getType()==ChartSeriesBean.TYPE_BAR)
 				//throw new ApplicationException("type bar is not supported");
 				chartBar();
@@ -512,7 +512,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		catch(IOException ioe) {
 			throw eng().getCastUtil().toPageException(ioe);
 		}
-		
+
 		return EVAL_PAGE;
 	}
 
@@ -520,25 +520,25 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		// do dataset
 		DefaultPieDataset dataset = new DefaultPieDataset();
 		ChartSeriesBean csb =  _series.get(0);
-        
+
 		ChartDataBean cdb;
-        
+
 		List datas=csb.getDatas();
 		if(sortxaxis)Collections.sort(datas);
         Iterator itt = datas.iterator();
     	while(itt.hasNext()) {
     		cdb=(ChartDataBean) itt.next();
     		dataset.setValue(cdb.getItemAsString(), cdb.getValue());
-    	}	
-		
-    	
+    	}
+
+
         JFreeChart chart = show3d?
         		ChartFactory.createPieChart3D	(title, dataset, false, true, true):
         		ChartFactory.createPieChart		(title, dataset, false, true, true);
-        
+
         Plot p = chart.getPlot();
 		PiePlot pp = (PiePlot)p;
-        
+
 		Font _font = getFont();
         pp.setLegendLabelGenerator(new PieSectionLegendLabelGeneratorImpl(_font,chartwidth));
         pp.setBaseSectionOutlinePaint(Color.GRAY); // rand der st_cke
@@ -548,12 +548,12 @@ public final class Chart extends BodyTagImpl implements Serializable {
         pp.setLabelLinkMargin(-0.05);
         pp.setInteriorGap(0.123);
         pp.setLabelGenerator(new PieSectionLabelGeneratorImpl(labelFormat));
-        
-        
-        
-        
+
+
+
+
         databackgroundcolor=backgroundcolor;
-        
+
         setBackground(chart,p);
 		setBorder(chart,p);
 		setLegend(chart,p,_font);
@@ -561,7 +561,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		setFont(chart, _font);
         setTooltip(chart);
         setScale(chart);
-        
+
         // Slice Type and colors
         boolean doSclice=pieslicestyle==PIE_SLICE_STYLE_SLICED;
         Color[] colors = csb.getColorlist();
@@ -570,22 +570,22 @@ public final class Chart extends BodyTagImpl implements Serializable {
     	while(it.hasNext()) {
     		cdb=(ChartDataBean) it.next();
             if(doSclice)pp.setExplodePercent(cdb.getItemAsString(), 0.13);
-            
+
             if(count<colors.length){
             	pp.setSectionPaint(cdb.getItemAsString(), colors[count]);
             }
             count++;
     	}
-        
+
         writeOut(chart);
 	}
-	
+
 
 	private void set3d(Plot plot) {
         if(!show3d) return;
-        
+
         plot.setForegroundAlpha(0.6f);
-        
+
         if(plot instanceof CategoryPlot) {
             plot.setForegroundAlpha(0.8f);
         	CategoryPlot cp=(CategoryPlot) plot;
@@ -594,17 +594,17 @@ public final class Chart extends BodyTagImpl implements Serializable {
         		BarRenderer3D br3d=(BarRenderer3D) renderer;
         		cp.setRenderer(new BarRenderer3DWrap(br3d,xoffset,yoffset));
         	}
-        	
+
         }
         else if(plot instanceof PiePlot3D) {
         	PiePlot3D pp3d=(PiePlot3D) plot;
-            pp3d.setDepthFactor(0.10);    
+            pp3d.setDepthFactor(0.10);
         }
-        
-        
+
+
 
         //CategoryItemRenderer renderer = plot.getRenderer();
-        
+
 	}
 
 	private void setFont(JFreeChart chart, Font font) {
@@ -615,7 +615,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			title.setPaint(foregroundcolor);
 			chart.setTitle(title);
 		}
-		
+
 		// axis fonts
 		Plot plot = chart.getPlot();
 		if(plot instanceof CategoryPlot) {
@@ -628,16 +628,16 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			setAxis(cp.getRangeAxis(),font);
 			setAxis(cp.getDomainAxis(),font);
 		}
-		
-		
+
+
 	}
-	
-	
+
+
 	private void setAxis(Axis axis, Font font) {
 		if(axis!=null) {
 			axis.setLabelFont(font);
 			axis.setLabelPaint(foregroundcolor);
-			
+
 			axis.setTickLabelFont(font);
 	        axis.setTickLabelPaint(foregroundcolor);
 	        axis.setTickLabelsVisible(true);
@@ -648,13 +648,13 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 	private void setLegend(JFreeChart chart, Plot plot, Font font) {
 		if(!showlegend) return;
-			
-			
+
+
 		Color bg = backgroundcolor==null?databackgroundcolor:backgroundcolor;
 		if(font==null)font=getFont();
-		
-		
-		
+
+
+
 		LegendTitle legend = legendMultiLine?
         		new LegendTitle(plot,new ColumnArrangement(), new ColumnArrangement()):
         		new LegendTitle(plot);
@@ -663,18 +663,18 @@ public final class Chart extends BodyTagImpl implements Serializable {
         legend.setFrame(new LineBorder());
         legend.setPosition(RectangleEdge.BOTTOM);
         legend.setHorizontalAlignment(HorizontalAlignment.LEFT);
-        
+
         legend.setWidth(chartwidth-20);// geht nicht
         legend.setItemFont(font);
 		legend.setItemPaint(foregroundcolor);
 
 		//RectangleInsets labelPadding;
 		legend.setItemLabelPadding(new RectangleInsets(2,2,2,2));
-		legend.setBorder(0,0,0,0); 
+		legend.setBorder(0,0,0,0);
 		legend.setLegendItemGraphicLocation(RectangleAnchor.TOP_LEFT);
 		legend.setLegendItemGraphicPadding(new RectangleInsets(8,10,0,0));
 		chart.addLegend(legend);
-		
+
 	}
 
 
@@ -693,14 +693,14 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		chart.setBackgroundPaint(backgroundcolor);
 		plot.setBackgroundPaint(databackgroundcolor);
 		chart.setBorderPaint(databackgroundcolor);
-		
-		
+
+
         plot.setOutlineVisible(false);
-		
+
 		// Pie
 		if(plot instanceof PiePlot) {
 			PiePlot pp=(PiePlot) plot;
-			pp.setLabelOutlinePaint(backgroundcolor); 
+			pp.setLabelOutlinePaint(backgroundcolor);
 	        pp.setLabelBackgroundPaint(backgroundcolor);
 	        pp.setLabelShadowPaint(backgroundcolor);
 	        pp.setShadowPaint(backgroundcolor);
@@ -708,27 +708,27 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		// Bar
 		/*if(plot instanceof CategoryPlot) {
 			CategoryPlot cp=(CategoryPlot) plot;
-			
+
 		}*/
 	}
 
 
 
-	
- 
+
+
 	private Font getFont() {
 		return new Font(font,fontstyle,fontsize);
 	}
 
 	private void writeOut(JFreeChart jfc) throws PageException, IOException {
 		final ChartRenderingInfo info=new ChartRenderingInfo();
-        
+
 		// map name
 		chartIndex++;
 		if(chartIndex<0)chartIndex=0;
 		String mapName="chart_"+chartIndex;
 		setUrl(jfc);
-		
+
 		// write out to variable
 		if(!Util.isEmpty(name)){
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -736,7 +736,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			pageContext.setVariable(name, baos.toByteArray());
 			return;
 		}
-		
+
 		// write out as link
 		String id= eng().getSystemUtil().hashMd5(JavaUtil.serialize(this));
 		Resource graph = pageContext.getConfig().getTempDirectory().getRealResource("graph");
@@ -746,13 +746,13 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			copy(res.getOutputStream(),jfc,info);
 		} else {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			copy(baos, jfc,info);			
+			copy(baos, jfc,info);
 		}
-		
+
 		String contextPath = pageContext.getHttpServletRequest().getContextPath();
 		contextPath = Util.isEmpty(contextPath) ? "/" : contextPath+"/";
 		String src=contextPath+"lucee/graph.cfm?img="+id+"&type="+formatToString(format);
-		
+
 		if(!Util.isEmpty(source)) {
 			pageContext.setVariable(source, src);
 			return;
@@ -763,17 +763,17 @@ public final class Chart extends BodyTagImpl implements Serializable {
 				pageContext.write(map);
 			}
 			pageContext.write("<img border=\"0\" usemap=\"#"+mapName+"\" src=\""+src+"\">");
-		} 
+		}
 		catch (IOException e) {
 			throw eng().getCastUtil().toPageException(e);
-		}		
+		}
 	}
 
 	private void copy(OutputStream os, JFreeChart jfc, ChartRenderingInfo info) throws PageException, IOException {
 		//OutputStream os = null;
 		try {
 			//os = res.getOutputStream();
-			
+
 			BufferedImage bi;
 			if (format==FORMAT_JPG) {
 				bi = jfc.createBufferedImage(chartwidth,chartheight,BufferedImage.TYPE_INT_RGB,info);
@@ -811,7 +811,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	private void clean(Resource graph) throws IOException {
 		if(!graph.exists())graph.createDirectory(true);
 		else if(graph.isDirectory() && FileUtil.getRealSize(graph)>(1024*1024)) {
-			
+
 			Resource[] children = graph.listResources();
 			long maxAge=System.currentTimeMillis()-(1000*60);
 			for(int i=0;i<children.length;i++) {
@@ -829,8 +829,8 @@ public final class Chart extends BodyTagImpl implements Serializable {
         Plot p = chart.getPlot();
         Font _font = getFont();
         // settings
-        
-        
+
+
         setBackground(chart,p);
 		setBorder(chart,p);
 		set3d(p);
@@ -841,10 +841,10 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		setScale(chart);
         setAxis(chart);
         setColor(chart);
-        
+
         writeOut(chart);
 	}
-	
+
 
 
 
@@ -856,7 +856,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
         	ChartFactory.createLineChart(title,xaxistitle,yaxistitle,createDatasetCategory(),PlotOrientation.VERTICAL,false,true,false);
         Plot p = chart.getPlot();
         Font _font = getFont();
-        
+
         // settings
         setMarker(chart,p);
         setBackground(chart,p);
@@ -869,16 +869,16 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		setScale(chart);
         setAxis(chart);
         setColor(chart);
-        
+
         writeOut(chart);
 	}
-	
+
 	private void chartArea() throws PageException, IOException {
 		// create the chart...
         final JFreeChart chart = ChartFactory.createAreaChart(title,xaxistitle,yaxistitle,createDatasetCategory(),PlotOrientation.VERTICAL,false,true,false);
         Plot p = chart.getPlot();
         Font _font = getFont();
-        
+
         // settings
         setMarker(chart,p);
         setBackground(chart,p);
@@ -891,16 +891,16 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		setScale(chart);
         setAxis(chart);
         setColor(chart);
-        
+
         writeOut(chart);
 	}
-	
+
 	private void chartTimeLine() throws PageException, IOException {
 		// create the chart...
         final JFreeChart chart = ChartFactory.createTimeSeriesChart(title,xaxistitle,yaxistitle,createTimeSeriesCollection(),false,true,false);
         Plot p = chart.getPlot();
         Font _font = getFont();
-        
+
         // settings
         setMarker(chart,p);
         setBackground(chart,p);
@@ -913,7 +913,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		setScale(chart);
         setAxis(chart);
         setColor(chart);
-        
+
         writeOut(chart);
 	}
 
@@ -925,8 +925,8 @@ public final class Chart extends BodyTagImpl implements Serializable {
     	final CategoryPlot p = chart.getCategoryPlot();
     	p.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
         Font _font = getFont();
-        // settings            
-        
+        // settings
+
         setBackground(chart,p);
 		setBorder(chart,p);
 		set3d(p);
@@ -937,16 +937,16 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		setScale(chart);
         setAxis(chart);
         setColor(chart);
-        
+
         writeOut(chart);
 	}
-	
+
 	private void chartScatter() throws PageException, IOException {
 		// create the chart...
 		final JFreeChart chart = ChartFactory.createScatterPlot(title,xaxistitle,yaxistitle,createXYSeriesCollection(),PlotOrientation.VERTICAL,false,true,false);
 		final XYPlot p = chart.getXYPlot();
 		Font _font = getFont();
-		// settings            
+		// settings
 
 		setBackground(chart,p);
 		setBorder(chart,p);
@@ -958,17 +958,17 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		setScale(chart);
 		setAxis(chart);
 		setColor(chart);
-		
+
 		writeOut(chart);
 	}
-	
+
 	private void chartStep() throws PageException, IOException {
 		// create the chart...
 		final JFreeChart chart = ChartFactory.createXYStepChart(title,xaxistitle,yaxistitle,createXYSeriesCollection(),PlotOrientation.VERTICAL,false,true,false);
 		final XYPlot p = chart.getXYPlot();
 		Font _font = getFont();
-		// settings            
-		
+		// settings
+
 		setBackground(chart,p);
 		setBorder(chart,p);
 		set3d(p);
@@ -981,19 +981,19 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		setScale(chart);
 		setAxis(chart);
 		setColor(chart);
-		
+
 		writeOut(chart);
 	}
-	
+
 
 
 	private void setMarker(JFreeChart chart, Plot p) {
 		if(!showmarkers) return;
-		
+
 		if(markersize<1 || markersize>100) markersize=4;
-		
-		
-		
+
+
+
 		if(p instanceof XYPlot) {
 			XYPlot xyp=(XYPlot) p;
 			XYItemRenderer r = xyp.getRenderer();
@@ -1001,7 +1001,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 				XYLineAndShapeRenderer xyr = (XYLineAndShapeRenderer) r;
 				xyr.setBaseShapesVisible(true);
 				xyr.setBaseShapesFilled(true);
-				
+
 				int seriesCount=_series.size();
 				for(int i=0;i<seriesCount;i++){
 					markerStyle = _series.get(i).getMarkerStyle();
@@ -1022,7 +1022,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			CategoryItemRenderer r = cp.getRenderer();
 			if (r instanceof LineAndShapeRenderer) {
 				LineAndShapeRenderer lsr = (LineAndShapeRenderer)r;
-			
+
 				int seriesCount=_series.size();
 				for(int i=0;i<seriesCount;i++){
 					markerStyle = _series.get(i).getMarkerStyle();
@@ -1046,22 +1046,22 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		Plot plot = chart.getPlot();
 		if(plot instanceof CategoryPlot) {
 			CategoryPlot cp=(CategoryPlot)plot;
-			
+
 			// Y
 			cp.setDomainGridlinesVisible(showygridlines);
 			if(showygridlines) cp.setDomainGridlinePaint(foregroundcolor);
-			
+
 			cp.setRangeGridlinesVisible(showxgridlines!=NO);
 			if(showxgridlines==NONE)cp.setRangeGridlinePaint(Color.GRAY);
 			else if(showxgridlines==YES)cp.setRangeGridlinePaint(foregroundcolor);
 		}
 		else if(plot instanceof XYPlot) {
 			XYPlot cp=(XYPlot)plot;
-			
+
 			// Y
 			cp.setDomainGridlinesVisible(showygridlines);
 			if(showygridlines) cp.setDomainGridlinePaint(foregroundcolor);
-			
+
 			cp.setRangeGridlinesVisible(showxgridlines!=NO);
 			if(showxgridlines==NONE)cp.setRangeGridlinePaint(Color.GRAY);
 			else if(showxgridlines==YES)cp.setRangeGridlinePaint(foregroundcolor);
@@ -1073,10 +1073,10 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	private void setTooltip(JFreeChart chart) {
 		Plot plot = chart.getPlot();
 		if(plot instanceof PiePlot) {
-			PiePlot pp = (PiePlot)plot;		
-			
+			PiePlot pp = (PiePlot)plot;
+
 			pp.setToolTipGenerator(new PieToolTipGeneratorImpl(labelFormat));
-			
+
 		}
 		else if(plot instanceof CategoryPlot) {
 			CategoryPlot cp=(CategoryPlot) plot;
@@ -1088,14 +1088,14 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			XYItemRenderer renderer = cp.getRenderer();
 			renderer.setBaseToolTipGenerator(new XYToolTipGeneratorImpl(labelFormat));
 		}*/
-		
+
 	}
 
 	private void setUrl(JFreeChart chart) {
 		if(Util.isEmpty(url)) return;
 		Plot plot = chart.getPlot();
 		if(plot instanceof PiePlot) {
-			PiePlot pp = (PiePlot)plot;		
+			PiePlot pp = (PiePlot)plot;
 			pp.setURLGenerator(new PieURLGenerator() {
 			    public String generateURL(PieDataset dataset, Comparable key, int pieIndex) {
 			    	Strings util = eng().getStringUtil();
@@ -1136,9 +1136,9 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			    }
 			});
 		}
-		
+
 	}
-	
+
 
 
 	private void setScale(JFreeChart chart) {
@@ -1149,11 +1149,11 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			Range r=rangeAxis.getRange();
 			double lower=r.getLowerBound();
 			double upper=r.getUpperBound();
-			
+
 			if(labelFormat==LabelFormatUtil.LABEL_FORMAT_DATE && rangeAxis.getRange().getLowerBound()==0) {
 				lower = smallest;
 				upper=biggest;
-				
+
 				lower=dateAdd(lower,lower);
 			}
 			if(!Double.isNaN(scalefrom))lower=scalefrom;
@@ -1166,7 +1166,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			Range r=rangeAxis.getRange();
 			double lower=r.getLowerBound();
 			double upper=r.getUpperBound();
-			
+
 			if(labelFormat==LabelFormatUtil.LABEL_FORMAT_DATE && rangeAxis.getRange().getLowerBound()==0) {
 				lower = smallest;
 				upper=biggest;
@@ -1183,7 +1183,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		try {
 			DateTime d = caster.toDate(caster.toDouble(time),true,null,null);
 			DateUtil.dateAdd(pageContext,"yyyy", -1, d);
-		} 
+		}
 		catch (Exception e) {
 			// MUST remove in the future the print out
 			e.printStackTrace();
@@ -1200,7 +1200,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			rangeAxis.setStandardTickUnits(new TickUnitsImpl(rangeAxis.getStandardTickUnits(),labelFormat));
 			CategoryItemRenderer r = cp.getRenderer();
 			r.setBaseItemLabelsVisible(false);
-			
+
 			CategoryAxis da = cp.getDomainAxis();
 			if(!showXLabel)da.setTickLabelsVisible(false);
 			da.setCategoryLabelPositions(labelPosition);
@@ -1237,18 +1237,18 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		Plot p = chart.getPlot();
 		if(p instanceof CategoryPlot) {
 			CategoryPlot cp=(CategoryPlot) p;
-			
+
 			CategoryItemRenderer renderer = cp.getRenderer();
-	        
-			
-			
+
+
+
 			Iterator<ChartSeriesBean> cs = _series.iterator();
 			//int seriesCount=_series.size();
 			ChartSeriesBean csb;
 			GradientPaint gp;
 			Color c=null;
 			Color[] ac;
-			
+
 			int index=0;
 			while(cs.hasNext()) {
 				csb= cs.next();
@@ -1259,7 +1259,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 						ac=csb.getColorlist();
 						if(ac!=null && ac.length>0)c=ac[0];
 					}
-					
+
 				//}
 				if(c==null) continue;
 				gp = new GradientPaint(0.0f, 0.0f, c, 0.0f, 0.0f,c);
@@ -1268,18 +1268,18 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		}
 		else if(p instanceof XYPlot) {
 			XYPlot cp=(XYPlot) p;
-			
+
 			XYItemRenderer renderer = cp.getRenderer();
-	        
-			
-			
+
+
+
 			Iterator<ChartSeriesBean> cs = _series.iterator();
 			//int seriesCount=_series.size();
 			ChartSeriesBean csb;
 			GradientPaint gp;
 			Color c=null;
 			Color[] ac;
-			
+
 			int index=0;
 			while(cs.hasNext()) {
 				csb= cs.next();
@@ -1290,7 +1290,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 						ac=csb.getColorlist();
 						if(ac!=null && ac.length>0)c=ac[0];
 					}
-					
+
 				//}
 				if(c==null) continue;
 				gp = new GradientPaint(0.0f, 0.0f, c, 0.0f, 0.0f,c);
@@ -1304,20 +1304,20 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	private DefaultPieDataset createDatasetPie() {
 		DefaultPieDataset dataset = new DefaultPieDataset();
 		ChartSeriesBean csb =  _series.get(0);
-        
+
 		ChartDataBean cdb;
         // write data set
         Iterator itt = csb.getDatas().iterator();
     	while(itt.hasNext()) {
     		cdb=(ChartDataBean) itt.next();
     		dataset.setValue(cdb.getItemAsString(), cdb.getValue());
-    	}	
+    	}
     	return dataset;
     }
-	
 
-	
-	
+
+
+
 
 	private CategoryDataset createDatasetCategory() {
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
@@ -1346,12 +1346,12 @@ public final class Chart extends BodyTagImpl implements Serializable {
         		if(smallest>cdb.getValue())smallest=cdb.getValue();
         		if(biggest<cdb.getValue())biggest=cdb.getValue();
         		//if(seriesCount>1)
-        		
+
         		dataset.addValue(cdb.getValue(), label,cdb.getItemAsString());
-        		
+
         		//else dataset.addValue(cdb.getValue(), cdb.getItem(),"");
-        		
-            	
+
+
         	}
         }
         if(!hasLabels)showlegend=false;
@@ -1360,7 +1360,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	private XYDataset createTimeSeriesCollection() {
 		TimeZone tz = eng().getThreadTimeZone();
 		final TimeSeriesCollection coll=new TimeSeriesCollection(tz);
-		
+
         //final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         Iterator<ChartSeriesBean> it = _series.iterator();
         //int seriesCount=_series.size();
@@ -1388,13 +1388,13 @@ public final class Chart extends BodyTagImpl implements Serializable {
         		if(smallest>cdb.getValue())smallest=cdb.getValue();
         		if(biggest<cdb.getValue())biggest=cdb.getValue();
         		//if(seriesCount>1)
-        		
-        		
+
+
         		ts.addOrUpdate(new Second(eng().getCastUtil().toDate(cdb.getItem(), false, tz, null)), cdb.getValue());
-        		
+
         		//else dataset.addValue(cdb.getValue(), cdb.getItem(),"");
-        		
-            	
+
+
         	}
             coll.addSeries(ts);
         }
@@ -1437,7 +1437,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		if(!hasLabels)showlegend=false;
 		return coll;
 	}
-	
+
 	/**
 	 * @param url the url to set
 	 */
@@ -1471,5 +1471,5 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	public void setXaxistype(String xaxistype) {
 		this.xaxistype = xaxistype;
 	}
-	
+
 }
