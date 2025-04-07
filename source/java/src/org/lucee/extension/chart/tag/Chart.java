@@ -26,10 +26,12 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -98,10 +100,7 @@ import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.util.ShapeUtilities;
 
-
 public final class Chart extends BodyTagImpl implements Serializable {
-
-
 
 	public static final Color COLOR_999999=new Color(0x99,0x99,0x99);
 	public static final Color COLOR_666666=new Color(0x66,0x66,0x66);
@@ -204,6 +203,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	private List<String> _plotItemLables = new ArrayList<String>();
 	private Color color=Color.BLACK;
 	private int markerStyle = ChartSeriesBean.MARKER_STYLE_RECTANGLE;
+	private boolean base64;
 
 	public void release() {
 		super.release();
@@ -262,6 +262,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		_plotItemLables = new ArrayList<String>();
 		color=Color.BLACK;
 		markerStyle = ChartSeriesBean.MARKER_STYLE_RECTANGLE;
+		base64=false;
 	}
 
 	public void setShowxlabel(boolean showXLabel) {
@@ -340,7 +341,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		//else if("flash".equals(strFormat))	format=FORMAT_FLASH;
 		//else if("swf".equals(strFormat))	format=FORMAT_FLASH;
 
-		else throw eng().getExceptionUtil().createApplicationException("invalid value ["+strFormat+"] for attribute format, for this attribute only the following values are supported [gif,jpg,png]");
+		else throw eng().getExceptionUtil().createApplicationException("invalid value ["+strFormat+"] for attribute format, for this attribute only the following values are supported [gif, jpg, png]");
 	}
 
 	public void setGridlines(double gridlines) {
@@ -722,47 +723,61 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 	private void writeOut(JFreeChart jfc) throws PageException, IOException {
 		final ChartRenderingInfo info=new ChartRenderingInfo();
+		String src;
 
-		// map name
-		chartIndex++;
-		if(chartIndex<0)chartIndex=0;
-		String mapName="chart_"+chartIndex;
 		setUrl(jfc);
 
 		// write out to variable
 		if(!Util.isEmpty(name)){
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			copy(baos, jfc,info);
-			pageContext.setVariable(name, baos.toByteArray());
+			if (base64){
+				src = toBase64(jfc, info);
+				pageContext.setVariable(name, src);
+			} else {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				copy(baos, jfc,info);
+				pageContext.setVariable(name, baos.toByteArray());
+			}
 			return;
 		}
 
-		// write out as link
-		String id= eng().getSystemUtil().hashMd5(JavaUtil.serialize(this));
-		Resource graph = pageContext.getConfig().getTempDirectory().getRealResource("graph");
-		Resource res = graph.getRealResource(id);
-		if(!res.exists()) {
-			clean(graph);
-			copy(res.getOutputStream(),jfc,info);
+		if (base64){
+			src = "data:image/png;base64," + toBase64(jfc, info);
 		} else {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			copy(baos, jfc,info);
+			// write out as link
+			String id= eng().getSystemUtil().hashMd5(JavaUtil.serialize(this));
+			Resource graph = pageContext.getConfig().getTempDirectory().getRealResource("graph");
+			Resource res = graph.getRealResource(id);
+			if(!res.exists()) {
+				clean(graph);
+				copy(res.getOutputStream(),jfc,info);
+			} else {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				copy(baos, jfc,info);
+			}
+
+			String contextPath = pageContext.getHttpServletRequest().getContextPath();
+			contextPath = Util.isEmpty(contextPath) ? "/" : contextPath+"/";
+			src=contextPath+"lucee/graph.cfm?img="+id+"&type="+formatToString(format);
 		}
-
-		String contextPath = pageContext.getHttpServletRequest().getContextPath();
-		contextPath = Util.isEmpty(contextPath) ? "/" : contextPath+"/";
-		String src=contextPath+"lucee/graph.cfm?img="+id+"&type="+formatToString(format);
-
 		if(!Util.isEmpty(source)) {
 			pageContext.setVariable(source, src);
 			return;
 		}
+
+		String mapName;
+
 		try {
-			if(showtooltip || !Util.isEmpty(url)) {
+			if (showtooltip || !Util.isEmpty(url)) {
+				// map name
+				chartIndex++;
+				if (chartIndex < 0 ) chartIndex=0;
+				mapName="chart_"+chartIndex;
 				String map=ChartUtilities.getImageMap(mapName,info).trim();
 				pageContext.write(map);
+				pageContext.write("<img border=\"0\" usemap=\"#"+mapName+"\" src=\""+src+"\">");
+			} else {
+				pageContext.write("<img border=\"0\" src=\""+src+"\">");
 			}
-			pageContext.write("<img border=\"0\" usemap=\"#"+mapName+"\" src=\""+src+"\">");
 		}
 		catch (IOException e) {
 			throw eng().getCastUtil().toPageException(e);
@@ -799,6 +814,22 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			try{if(os!=null)os.flush();}catch (Exception t){}
 			eng().getIOUtil().closeSilent(os);
 		}
+	}
+
+	private String toBase64( JFreeChart jfc, ChartRenderingInfo info) throws PageException, IOException {
+		if (format!=FORMAT_PNG)	throw eng().getExceptionUtil().createApplicationException("Only PNG format supported for base64");
+
+		BufferedImage bi = jfc.createBufferedImage(chartwidth,chartheight,info);
+		// add border
+		if(showborder) {
+			try {
+				bi=ImageUtil.addBorder(bi, 1,color);
+			}
+			catch (PageException e) {}
+		}
+
+		byte[] imageBytes = ChartUtilities.encodeAsPNG(bi);
+		return Base64.getEncoder().encodeToString(imageBytes);
 	}
 
 	private String formatToString(int format) {
@@ -1470,6 +1501,10 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	 */
 	public void setXaxistype(String xaxistype) {
 		this.xaxistype = xaxistype;
+	}
+
+	public void setBase64(boolean base64) {
+		this.base64 = base64;
 	}
 
 }

@@ -348,6 +348,13 @@
 			<description>Applies if show3D="yes". Number of units by which to
             display the chart as angled, horizontally.</description>
 		</attribute>
+		<attribute>
+			<type>boolean</type>
+			<name>base64</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>Render chart inline using a base64 data url.</description>
+		</attribute>
 	</tag>
 	<!-- Chartdata -->
 	<tag>
