@@ -293,8 +293,17 @@
 			<name>url</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-			<description>URL to open if the user clicks item in a data series; the
-            onClick destination page.</description>
+			<description>URL to open if the user clicks item in a data series; the onClick destination page.
+
+			The following variables will be subsituted [ $SERIESLABEL$,  $ITEMLABEL$, $VALUE$ ]
+
+			If the url does not contains a ? the following is appended
+			?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$
+
+			Otherwise, you will need to specify the query string manually
+
+			If the url starts with `javascript:` only variable subsitution is done.
+			</description>
 		</attribute>
 		<attribute>
 			<type>string</type>

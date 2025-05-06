@@ -1130,7 +1130,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			pp.setURLGenerator(new PieURLGenerator() {
 			    public String generateURL(PieDataset dataset, Comparable key, int pieIndex) {
 			    	Strings util = eng().getStringUtil();
-			    	if(!url.contains("?") && !url.toLowerCase().startsWith("javascript:")) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
+			    	if(!(url.contains("?") || url.toLowerCase().startsWith("javascript:"))) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
 			    	String retUrl=util.replace(url, "$ITEMLABEL$", URLUtilities.encode(key.toString(),"UTF-8"),false,true);
 			    	retUrl = util.replace(retUrl,"$SERIESLABEL$",Integer.toString(pieIndex),false,true);
 			    	retUrl = util.replace(retUrl,"$VALUE$",URLUtilities.encode(dataset.getValue(key).toString(),"UTF-8"),false,true);
@@ -1144,7 +1144,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			renderer.setBaseItemURLGenerator(new StandardCategoryURLGenerator() {
 			    public String generateURL(CategoryDataset dataset, int series,int category) {
 			    	Strings util = eng().getStringUtil();
-			    	if(!url.contains("?") && !url.toLowerCase().startsWith("javascript:")) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
+			    	if(!(url.contains("?") || url.toLowerCase().startsWith("javascript:"))) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
 			    	String retUrl=util.replace(url, "$ITEMLABEL$", URLUtilities.encode(dataset.getColumnKey(category).toString(),"UTF-8"),false,true);
 			    	retUrl = util.replace(retUrl,"$SERIESLABEL$",URLUtilities.encode(dataset.getRowKey(series).toString(),"UTF-8"),false,true);
 			    	retUrl = util.replace(retUrl,"$VALUE$",URLUtilities.encode(dataset.getValue(series, category).toString(),"UTF-8"),false,true);
@@ -1158,7 +1158,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			renderer.setURLGenerator(new StandardXYURLGenerator() {
 			    public String generateURL(XYDataset dataset, int series,int category) {
 			    	Strings util = eng().getStringUtil();
-			    	if(!url.contains("?") && !url.toLowerCase().startsWith("javascript:")) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
+			    	if(!(url.contains("?") || url.toLowerCase().startsWith("javascript:"))) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
 			    	String itemLabel = _plotItemLables.get(category+1) != null ? _plotItemLables.get(category+1) : dataset.getX(series, category).toString();
 			    	String retUrl=util.replace(url, "$ITEMLABEL$", URLUtilities.encode(itemLabel,"UTF-8"),false,true);
 			    	retUrl = util.replace(retUrl,"$SERIESLABEL$",URLUtilities.encode(dataset.getSeriesKey(series).toString(),"UTF-8"),false,true);
