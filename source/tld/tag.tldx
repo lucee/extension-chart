@@ -298,7 +298,8 @@
 			The following variables will be subsituted [ $SERIESLABEL$,  $ITEMLABEL$, $VALUE$ ]
 
 			If the url does not contains a ? the following is appended
-			?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$
+
+			`?series=$SERIESLABEL$&amp;category=$ITEMLABEL$&amp;value=$VALUE$`
 
 			Otherwise, you will need to specify the query string manually
 
