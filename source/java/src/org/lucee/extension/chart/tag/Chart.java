@@ -4,17 +4,17 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either 
+ * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
+ *
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  **/
 package org.lucee.extension.chart.tag;
 
@@ -22,12 +22,15 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Rectangle;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -196,6 +199,8 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	private String source;
 	private List<String> _plotItemLables = new ArrayList<String>();
 	private Color color = Color.BLACK;
+	private int markerStyle = ChartSeriesBean.MARKER_STYLE_RECTANGLE;
+	private boolean base64;
 
 	@Override
 	public void release() {
@@ -254,6 +259,8 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		tipstyle = TIP_STYLE_MOUSEOVER;
 		_plotItemLables = new ArrayList<String>();
 		color = Color.BLACK;
+		markerStyle = ChartSeriesBean.MARKER_STYLE_RECTANGLE;
+		base64 = false;
 	}
 
 	public void setShowxlabel(boolean showXLabel) {
@@ -340,7 +347,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		// else if("swf".equals(strFormat)) format=FORMAT_FLASH;
 
 		else throw eng().getExceptionUtil()
-				.createApplicationException("invalid value [" + strFormat + "] for attribute format, for this attribute only the following values are supported [gif,jpg,png]");
+				.createApplicationException("invalid value [" + strFormat + "] for attribute format, for this attribute only the following values are supported [gif, jpg, png]");
 	}
 
 	public void setGridlines(double gridlines) {
@@ -484,7 +491,6 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		// cfchart");
 		// doSingleSeries((ChartSeriesBean) _series.get(0));
 		ChartSeriesBean first = _series.get(0);
-
 		try {
 
 			if (first.getType() == ChartSeriesBean.TYPE_BAR)
@@ -691,48 +697,65 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 	private void writeOut(JFreeChart jfc) throws PageException, IOException {
 		final ChartRenderingInfo info = new ChartRenderingInfo();
+		String src;
 
-		// map name
-		chartIndex++;
-		if (chartIndex < 0) chartIndex = 0;
-		String mapName = "chart_" + chartIndex;
 		setUrl(jfc);
 
 		// write out to variable
 		if (!Util.isEmpty(name)) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			copy(baos, jfc, info);
-			pageContext.setVariable(name, baos.toByteArray());
+			if (base64) {
+				src = toBase64(jfc, info);
+				pageContext.setVariable(name, src);
+			}
+			else {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				copy(baos, jfc, info);
+				pageContext.setVariable(name, baos.toByteArray());
+			}
 			return;
 		}
 
-		// write out as link
-		String id = eng().getSystemUtil().hashMd5(JavaUtil.serialize(this));
-		Resource graph = pageContext.getConfig().getTempDirectory().getRealResource("graph");
-		Resource res = graph.getRealResource(id);
-		if (!res.exists()) {
-			clean(graph);
-			copy(res.getOutputStream(), jfc, info);
+		if (base64) {
+			src = "data:image/png;base64," + toBase64(jfc, info);
 		}
 		else {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			copy(baos, jfc, info);
+			// write out as link
+			String id = eng().getSystemUtil().hashMd5(JavaUtil.serialize(this));
+			Resource graph = pageContext.getConfig().getTempDirectory().getRealResource("graph");
+			Resource res = graph.getRealResource(id);
+			if (!res.exists()) {
+				clean(graph);
+				copy(res.getOutputStream(), jfc, info);
+			}
+			else {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				copy(baos, jfc, info);
+			}
+
+			String contextPath = pageContext.getHttpServletRequest().getContextPath();
+			contextPath = Util.isEmpty(contextPath) ? "/" : contextPath + "/";
+			src = contextPath + "lucee/graph.cfm?img=" + id + "&type=" + formatToString(format);
 		}
-
-		String contextPath = pageContext.getHttpServletRequest().getContextPath();
-		contextPath = Util.isEmpty(contextPath) ? "/" : contextPath + "/";
-		String src = contextPath + "lucee/graph.cfm?img=" + id + "&type=" + formatToString(format);
-
 		if (!Util.isEmpty(source)) {
 			pageContext.setVariable(source, src);
 			return;
 		}
+
+		String mapName;
+
 		try {
 			if (showtooltip || !Util.isEmpty(url)) {
+				// map name
+				chartIndex++;
+				if (chartIndex < 0) chartIndex = 0;
+				mapName = "chart_" + chartIndex;
 				String map = ChartUtilities.getImageMap(mapName, info).trim();
 				pageContext.write(map);
+				pageContext.write("<img border=\"0\" usemap=\"#" + mapName + "\" src=\"" + src + "\">");
 			}
-			pageContext.write("<img border=\"0\" usemap=\"#" + mapName + "\" src=\"" + src + "\">");
+			else {
+				pageContext.write("<img border=\"0\" src=\"" + src + "\">");
+			}
 		}
 		catch (IOException e) {
 			throw eng().getCastUtil().toPageException(e);
@@ -775,6 +798,23 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			}
 			eng().getIOUtil().closeSilent(os);
 		}
+	}
+
+	private String toBase64(JFreeChart jfc, ChartRenderingInfo info) throws PageException, IOException {
+		if (format != FORMAT_PNG) throw eng().getExceptionUtil().createApplicationException("Only PNG format supported for base64");
+
+		BufferedImage bi = jfc.createBufferedImage(chartwidth, chartheight, info);
+		// add border
+		if (showborder) {
+			try {
+				bi = ImageUtil.addBorder(bi, 1, color);
+			}
+			catch (PageException e) {
+			}
+		}
+
+		byte[] imageBytes = ChartUtilities.encodeAsPNG(bi);
+		return Base64.getEncoder().encodeToString(imageBytes);
 	}
 
 	private String formatToString(int format) {
@@ -967,9 +1007,15 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 				int seriesCount = _series.size();
 				for (int i = 0; i < seriesCount; i++) {
+					markerStyle = _series.get(i).getMarkerStyle();
 					xyr.setSeriesShapesVisible(i, true);
 					xyr.setSeriesItemLabelsVisible(i, true);
-					xyr.setSeriesShape(i, ShapeUtilities.createDiamond(markersize));
+					if (markerStyle == ChartSeriesBean.MARKER_STYLE_CIRCLE) xyr.setSeriesShape(i, new Ellipse2D.Double(-markersize / 2, -markersize / 2, markersize, markersize));
+					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_TRIANGLE) xyr.setSeriesShape(i, ShapeUtilities.createUpTriangle(markersize));
+					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_DIAMOND) xyr.setSeriesShape(i, ShapeUtilities.createDiamond(markersize));
+					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_MCROSS || markerStyle == ChartSeriesBean.MARKER_STYLE_RCROSS)
+						xyr.setSeriesShape(i, ShapeUtilities.createDiagonalCross(markersize, 1));
+					else xyr.setSeriesShape(i, new Rectangle2D.Double(-markersize / 2, -markersize / 2, markersize, markersize));
 					xyr.setUseFillPaint(true);
 					xyr.setBaseFillPaint(databackgroundcolor);
 				}
@@ -983,9 +1029,15 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 				int seriesCount = _series.size();
 				for (int i = 0; i < seriesCount; i++) {
+					markerStyle = _series.get(i).getMarkerStyle();
 					lsr.setSeriesShapesVisible(i, true);
 					lsr.setSeriesItemLabelsVisible(i, true);
-					lsr.setSeriesShape(i, ShapeUtilities.createDiamond(markersize));
+					if (markerStyle == ChartSeriesBean.MARKER_STYLE_CIRCLE) lsr.setSeriesShape(i, new Ellipse2D.Double(-markersize / 2, -markersize / 2, markersize, markersize));
+					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_TRIANGLE) lsr.setSeriesShape(i, ShapeUtilities.createUpTriangle(markersize));
+					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_DIAMOND) lsr.setSeriesShape(i, ShapeUtilities.createDiamond(markersize));
+					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_MCROSS || markerStyle == ChartSeriesBean.MARKER_STYLE_RCROSS)
+						lsr.setSeriesShape(i, ShapeUtilities.createDiagonalCross(markersize, 1));
+					else lsr.setSeriesShape(i, new Rectangle2D.Double(-markersize / 2, -markersize / 2, markersize, markersize));
 					lsr.setUseFillPaint(true);
 					lsr.setBaseFillPaint(databackgroundcolor);
 				}
@@ -1407,6 +1459,10 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	 */
 	public void setXaxistype(String xaxistype) {
 		this.xaxistype = xaxistype;
+	}
+
+	public void setBase64(boolean base64) {
+		this.base64 = base64;
 	}
 
 }
