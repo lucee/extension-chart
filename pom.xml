@@ -51,7 +51,7 @@
         </developer>
     </developers>
 
-    <description>A comprehensive charting extension for Lucee Server that provides server-side chart generation capabilities using the JFreeChart library. Enables developers to create professional-quality charts including line, bar, pie, area, scatter, and time series charts directly from CFML code. Features extensive customization options for colors, labels, legends, and styling, with support for multiple output formats (PNG, JPEG, SVG). Ideal for dashboards, reports, and data visualization applications requiring dynamic chart generation without client-side dependencies.</description>
+    <description>Chart generation extension for Lucee using JFreeChart.</description>
     <url>https://github.com/lucee/extension-chart</url>
 
     <profiles>
