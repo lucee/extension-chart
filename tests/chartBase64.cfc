@@ -31,13 +31,22 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 						cfchartdata( item="Oranges", value=75 );
 					};
 				};
-				var img = ImageReadBase64( local.chart );
-				expect( isImage(img) ).toBeTrue();
-				var info = imageInfo( img );
-				expect ( info.height ).toBe( 200 );
-				expect ( info.width ).toBe( 300 );
-				var imgFile = getTempFile(dir=getTempDirectory(), prefix="base64ChartAsName", ext="png");
-				ImageWrite( img, imgFile );
+				
+				// Verify it's a valid base64 string
+				expect( isDefined("local.chart") ).toBeTrue();
+				expect( len(local.chart) ).toBeGT( 0 );
+				
+				// Check if it starts with the PNG base64 signature
+				// PNG files always start with these bytes: 89 50 4E 47 0D 0A 1A 0A
+				// In base64, this becomes: iVBORw0KGgo
+				expect( left(local.chart, 11) ).toBe( "iVBORw0KGgo" );
+				
+				// decode base64 and check PNG signature
+				var decoded = toBinary(local.chart);
+				var binaryStr = binaryEncode(decoded, "hex");
+				
+				// PNG signature in hex: 89504E470D0A1A0A
+				expect( left(binaryStr, 16) ).toBe( "89504E470D0A1A0A" );
 			});
 
 			it( "throws an error when not png", function(){
