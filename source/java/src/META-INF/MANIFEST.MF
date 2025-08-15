@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Export-Package: org.lucee.extension.pdf.tag
+Export-Package: org.lucee.extension.chart.tag
 Bundle-ManifestVersion: 2
 Require-Bundle: org.jfree.chart;bundle-version=1.0.19.0001L,
  org.jfree.common;bundle-version=1.0.23.0001L,
