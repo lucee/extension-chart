@@ -127,8 +127,7 @@
                                     <property name="description" value="${project.description}"/>
                                     <property name="srcversion" value="${maven.compiler.source}"/>
                                     <property name="trgversion" value="${maven.compiler.target}"/>
-                                
-</ant>
+                                </ant>
                                 <condition property="isSnapshot" value="true" else="false">
                                     <matches string="${project.version}" pattern=".*-SNAPSHOT"/>
                                 </condition>
