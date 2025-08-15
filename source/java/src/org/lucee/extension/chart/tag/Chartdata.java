@@ -18,26 +18,26 @@
  **/
 package org.lucee.extension.chart.tag;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.Tag;
+import jakarta.servlet.jsp.tagext.Tag;
+import lucee.runtime.exp.PageException;
 
 public final class Chartdata extends TagImpl {
 
-	private ChartDataBean data=new ChartDataBean();
-	
+	private ChartDataBean data = new ChartDataBean();
+
 	@Override
 	public void release() {
 		super.release();
-		data=new ChartDataBean();
+		data = new ChartDataBean();
 	}
-	
+
 	/**
 	 * @param item the item to set
 	 */
 	public void setItem(String item) {
 		data.setItem(item);
 	}
-	
+
 	/**
 	 * @param value the value to set
 	 */
@@ -46,18 +46,18 @@ public final class Chartdata extends TagImpl {
 	}
 
 	@Override
-	public int doStartTag() throws JspException {
+	public int doStartTag() throws PageException {
 
-		//print.out("do start tag");
-		Tag parent=this;
-		do{
+		// print.out("do start tag");
+		Tag parent = this;
+		do {
 			parent = parent.getParent();
-			if(parent instanceof Chartseries) {
-				((Chartseries)parent).addChartData(data);
+			if (parent instanceof Chartseries) {
+				((Chartseries) parent).addChartData(data);
 				break;
 			}
 		}
-		while(parent!=null);
+		while (parent != null);
 		return SKIP_BODY;
 	}
 }

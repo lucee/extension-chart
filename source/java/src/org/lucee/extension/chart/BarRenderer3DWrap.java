@@ -34,13 +34,13 @@ public class BarRenderer3DWrap extends BarRenderer3D {
 
 	@Override
 	public double getXOffset() {
-		// TODO Auto-generated method stub
+		
 		return xoffset*100;
 	}
 
 	@Override
 	public double getYOffset() {
-		// TODO Auto-generated method stub
+		
 		return yoffset*100;
 	}
 

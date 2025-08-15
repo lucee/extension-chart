@@ -19,36 +19,35 @@
  **/
 package org.lucee.extension.chart.tag;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.BodyContent;
-import javax.servlet.jsp.tagext.BodyTag;
+import jakarta.servlet.jsp.tagext.BodyContent;
+import jakarta.servlet.jsp.tagext.BodyTag;
+import lucee.runtime.exp.PageException;
 
 /**
  * Implementation of the Tag
  */
 public abstract class BodyTagImpl extends TagImpl implements BodyTag {
 
-	protected BodyContent bodyContent=null;
-	
+	protected BodyContent bodyContent = null;
 
 	@Override
 	public void setBodyContent(BodyContent bodyContent) {
-		this.bodyContent=bodyContent;
+		this.bodyContent = bodyContent;
 	}
 
 	@Override
-	public void doInitBody() throws JspException {
-		
+	public void doInitBody() throws PageException {
+
 	}
 
 	@Override
-	public int doAfterBody() throws JspException {
+	public int doAfterBody() throws PageException {
 		return SKIP_BODY;
 	}
-	 
+
 	@Override
 	public void release() {
 		super.release();
-		bodyContent=null;
-	}    	
+		bodyContent = null;
+	}
 }

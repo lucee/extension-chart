@@ -20,9 +20,7 @@ package org.lucee.extension.chart.tag;
 
 import java.awt.Color;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.Tag;
-
+import jakarta.servlet.jsp.tagext.Tag;
 import lucee.loader.engine.CFMLEngine;
 import lucee.loader.engine.CFMLEngineFactory;
 import lucee.loader.util.Util;
@@ -30,183 +28,196 @@ import lucee.runtime.exp.PageException;
 import lucee.runtime.type.Query;
 
 public final class Chartseries extends BodyTagImpl {
-	
-	private ChartSeriesBean series=new ChartSeriesBean();
+
+	private ChartSeriesBean series = new ChartSeriesBean();
 	private String itemColumn;
 	private Query query;
 	private String valueColumn;
-	
+
 	@Override
 	public void release() {
 		super.release();
-		series=new ChartSeriesBean();
-		itemColumn=null;
-		valueColumn=null;
-		query=null;
+		series = new ChartSeriesBean();
+		itemColumn = null;
+		valueColumn = null;
+		query = null;
 	}
+
 	/**
 	 * @param colorlist the colorlist to set
-	 * @throws PageException 
+	 * @throws PageException
 	 */
 	public void setColorlist(String strColorlist) throws PageException {
-		String[] arr=CFMLEngineFactory.getInstance().getListUtil().toStringArray(strColorlist.trim(),",");
-		Color[] colorlist=new Color[arr.length];
-		for(int i=0;i<arr.length;i++) {
-			colorlist[i]=CFMLEngineFactory.getInstance().getCastUtil().toColor(arr[i]);
+		String[] arr = CFMLEngineFactory.getInstance().getListUtil().toStringArray(strColorlist.trim(), ",");
+		Color[] colorlist = new Color[arr.length];
+		for (int i = 0; i < arr.length; i++) {
+			colorlist[i] = CFMLEngineFactory.getInstance().getCastUtil().toColor(arr[i]);
 		}
 		series.setColorlist(colorlist);
 	}
+
 	/**
 	 * @param dataLabelStyle the dataLabelStyle to set
-	 * @throws PageException 
+	 * @throws PageException
 	 */
 	public void setDatalabelstyle(String strDataLabelStyle) throws PageException {
-		strDataLabelStyle=strDataLabelStyle.trim().toLowerCase();
-		
-		if("none".equals(strDataLabelStyle))			series.setDataLabelStyle(ChartSeriesBean.DATA_LABEL_STYLE_NONE);
-		else if("value".equals(strDataLabelStyle))		series.setDataLabelStyle(ChartSeriesBean.DATA_LABEL_STYLE_VALUE);
-		else if("rowlabel".equals(strDataLabelStyle))	series.setDataLabelStyle(ChartSeriesBean.DATA_LABEL_STYLE_ROWLABEL);
-		else if("columnlabel".equals(strDataLabelStyle))series.setDataLabelStyle(ChartSeriesBean.DATA_LABEL_STYLE_COLUMNLABEL);
-		else if("pattern".equals(strDataLabelStyle))	series.setDataLabelStyle(ChartSeriesBean.DATA_LABEL_STYLE_PATTERN);
-		
-		else throw CFMLEngineFactory.getInstance().getExceptionUtil().createApplicationException("invalid value ["+strDataLabelStyle+"] for attribute dataLabelStyle, for this attribute only the following values are supported " +
-				"[none, value, rowlabel, columnlabel, pattern]");
+		strDataLabelStyle = strDataLabelStyle.trim().toLowerCase();
+
+		if ("none".equals(strDataLabelStyle)) series.setDataLabelStyle(ChartSeriesBean.DATA_LABEL_STYLE_NONE);
+		else if ("value".equals(strDataLabelStyle)) series.setDataLabelStyle(ChartSeriesBean.DATA_LABEL_STYLE_VALUE);
+		else if ("rowlabel".equals(strDataLabelStyle)) series.setDataLabelStyle(ChartSeriesBean.DATA_LABEL_STYLE_ROWLABEL);
+		else if ("columnlabel".equals(strDataLabelStyle)) series.setDataLabelStyle(ChartSeriesBean.DATA_LABEL_STYLE_COLUMNLABEL);
+		else if ("pattern".equals(strDataLabelStyle)) series.setDataLabelStyle(ChartSeriesBean.DATA_LABEL_STYLE_PATTERN);
+
+		else throw CFMLEngineFactory.getInstance().getExceptionUtil().createApplicationException("invalid value [" + strDataLabelStyle
+				+ "] for attribute dataLabelStyle, for this attribute only the following values are supported " + "[none, value, rowlabel, columnlabel, pattern]");
 	}
+
 	/**
 	 * @param itemColumn the itemColumn to set
 	 */
 	public void setItemcolumn(String itemColumn) {
-		this.itemColumn=itemColumn;
+		this.itemColumn = itemColumn;
 	}
+
 	/**
 	 * @param markerStyle the markerStyle to set
-	 * @throws PageException 
+	 * @throws PageException
 	 */
 	public void setMarkerstyle(String strMarkerStyle) throws PageException {
-		strMarkerStyle=strMarkerStyle.trim().toLowerCase();
-		
-		if("circle".equals(strMarkerStyle))			series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_CIRCLE);
-		else if("diamond".equals(strMarkerStyle))	series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_DIAMOND);
-		else if("letter".equals(strMarkerStyle))	series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_LETTER);
-		else if("mcross".equals(strMarkerStyle))	series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_MCROSS);
-		else if("rcross".equals(strMarkerStyle))	series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_RCROSS);
-		else if("rectangle".equals(strMarkerStyle))	series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_RECTANGLE);
-		else if("snow".equals(strMarkerStyle))		series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_SNOW);
-		else if("triangle".equals(strMarkerStyle))	series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_TRIANGLE);
-		
-		else throw CFMLEngineFactory.getInstance().getExceptionUtil().createApplicationException("invalid value ["+strMarkerStyle+"] for attribute markerStyle, for this attribute only the following values are supported " +
-				"[circle, diamond, letter, mcross, rcross, rectangle, snow, triangle]");
+		strMarkerStyle = strMarkerStyle.trim().toLowerCase();
+
+		if ("circle".equals(strMarkerStyle)) series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_CIRCLE);
+		else if ("diamond".equals(strMarkerStyle)) series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_DIAMOND);
+		else if ("letter".equals(strMarkerStyle)) series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_LETTER);
+		else if ("mcross".equals(strMarkerStyle)) series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_MCROSS);
+		else if ("rcross".equals(strMarkerStyle)) series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_RCROSS);
+		else if ("rectangle".equals(strMarkerStyle)) series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_RECTANGLE);
+		else if ("snow".equals(strMarkerStyle)) series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_SNOW);
+		else if ("triangle".equals(strMarkerStyle)) series.setMarkerStyle(ChartSeriesBean.MARKER_STYLE_TRIANGLE);
+
+		else throw CFMLEngineFactory.getInstance().getExceptionUtil()
+				.createApplicationException("invalid value [" + strMarkerStyle + "] for attribute markerStyle, for this attribute only the following values are supported "
+						+ "[circle, diamond, letter, mcross, rcross, rectangle, snow, triangle]");
 	}
+
 	/**
 	 * @param paintStyle the paintStyle to set
-	 * @throws PageException 
+	 * @throws PageException
 	 */
 	public void setPaintstyle(String strPaintStyle) throws PageException {
-		strPaintStyle=strPaintStyle.trim().toLowerCase();
-		
-		if("light".equals(strPaintStyle))		series.setPaintStyle(ChartSeriesBean.PAINT_STYLE_LIGHT);
-		else if("plain".equals(strPaintStyle))	series.setPaintStyle(ChartSeriesBean.PAINT_STYLE_PLAIN);
-		else if("raise".equals(strPaintStyle))	series.setPaintStyle(ChartSeriesBean.PAINT_STYLE_RAISE);
-		else if("shade".equals(strPaintStyle))	series.setPaintStyle(ChartSeriesBean.PAINT_STYLE_SHADE);
-		
-		else throw CFMLEngineFactory.getInstance().getExceptionUtil().createApplicationException("invalid value ["+strPaintStyle+"] for attribute paintStyle, for this attribute only the following values are supported " +
-				"[light, plain, raise, shade]");
+		strPaintStyle = strPaintStyle.trim().toLowerCase();
+
+		if ("light".equals(strPaintStyle)) series.setPaintStyle(ChartSeriesBean.PAINT_STYLE_LIGHT);
+		else if ("plain".equals(strPaintStyle)) series.setPaintStyle(ChartSeriesBean.PAINT_STYLE_PLAIN);
+		else if ("raise".equals(strPaintStyle)) series.setPaintStyle(ChartSeriesBean.PAINT_STYLE_RAISE);
+		else if ("shade".equals(strPaintStyle)) series.setPaintStyle(ChartSeriesBean.PAINT_STYLE_SHADE);
+
+		else throw CFMLEngineFactory.getInstance().getExceptionUtil().createApplicationException(
+				"invalid value [" + strPaintStyle + "] for attribute paintStyle, for this attribute only the following values are supported " + "[light, plain, raise, shade]");
 	}
+
 	/**
 	 * @param query the query to set
-	 * @throws PageException 
+	 * @throws PageException
 	 */
 	public void setQuery(Object oQuery) throws PageException {
-		if(oQuery instanceof Query) this.query=(Query)oQuery;
-		else if(oQuery instanceof String) this.query=pageContext.getQuery((String)oQuery);
-		else query=CFMLEngineFactory.getInstance().getCastUtil().toQuery(oQuery);
+		if (oQuery instanceof Query) this.query = (Query) oQuery;
+		else if (oQuery instanceof String) this.query = pageContext.getQuery((String) oQuery);
+		else query = CFMLEngineFactory.getInstance().getCastUtil().toQuery(oQuery);
 	}
+
 	/**
 	 * @param seriesColor the seriesColor to set
-	 * @throws PageException 
+	 * @throws PageException
 	 */
 	public void setSeriescolor(String strSeriesColor) throws PageException {
 		series.setSeriesColor(CFMLEngineFactory.getInstance().getCastUtil().toColor(strSeriesColor));
 	}
+
 	/**
 	 * @param seriesLabel the seriesLabel to set
 	 */
 	public void setSerieslabel(String seriesLabel) {
 		series.setSeriesLabel(seriesLabel);
 	}
+
 	/**
 	 * @param type the type to set
-	 * @throws PageException 
+	 * @throws PageException
 	 */
 	public void setType(String strType) throws PageException {
-		strType=strType.trim().toLowerCase();
-		
-		if("area".equals(strType))					series.setType(ChartSeriesBean.TYPE_AREA);
-		else if("bar".equals(strType))				series.setType(ChartSeriesBean.TYPE_BAR);
-		else if("cone".equals(strType))				series.setType(ChartSeriesBean.TYPE_CONE);
-		else if("curve".equals(strType))			series.setType(ChartSeriesBean.TYPE_CURVE);
-		else if("cylinder".equals(strType))			series.setType(ChartSeriesBean.TYPE_CYLINDER);
-		else if("horizontalbar".equals(strType))	series.setType(ChartSeriesBean.TYPE_HORIZONTALBAR);
-		else if("line".equals(strType))				series.setType(ChartSeriesBean.TYPE_LINE);
-		else if("timeline".equals(strType))				series.setType(ChartSeriesBean.TYPE_TIME);
-		else if("time".equals(strType))				series.setType(ChartSeriesBean.TYPE_TIME);
-		else if("pie".equals(strType))				series.setType(ChartSeriesBean.TYPE_PIE);
-		else if("pyramid".equals(strType))			series.setType(ChartSeriesBean.TYPE_PYRAMID);
-		else if("scatter".equals(strType))			series.setType(ChartSeriesBean.TYPE_SCATTER);
-		else if("scatte".equals(strType))			series.setType(ChartSeriesBean.TYPE_SCATTER);
-		else if("step".equals(strType))				series.setType(ChartSeriesBean.TYPE_STEP);
-		
-		else throw CFMLEngineFactory.getInstance().getExceptionUtil().createApplicationException("invalid value ["+strType+"] for attribute type, for this attribute only the following values are supported " +
-				"[area, bar, cone, curve, cylinder, horizontalbar, line,pie,pyramid,scatter,step,timeline]");
+		strType = strType.trim().toLowerCase();
+
+		if ("area".equals(strType)) series.setType(ChartSeriesBean.TYPE_AREA);
+		else if ("bar".equals(strType)) series.setType(ChartSeriesBean.TYPE_BAR);
+		else if ("cone".equals(strType)) series.setType(ChartSeriesBean.TYPE_CONE);
+		else if ("curve".equals(strType)) series.setType(ChartSeriesBean.TYPE_CURVE);
+		else if ("cylinder".equals(strType)) series.setType(ChartSeriesBean.TYPE_CYLINDER);
+		else if ("horizontalbar".equals(strType)) series.setType(ChartSeriesBean.TYPE_HORIZONTALBAR);
+		else if ("line".equals(strType)) series.setType(ChartSeriesBean.TYPE_LINE);
+		else if ("timeline".equals(strType)) series.setType(ChartSeriesBean.TYPE_TIME);
+		else if ("time".equals(strType)) series.setType(ChartSeriesBean.TYPE_TIME);
+		else if ("pie".equals(strType)) series.setType(ChartSeriesBean.TYPE_PIE);
+		else if ("pyramid".equals(strType)) series.setType(ChartSeriesBean.TYPE_PYRAMID);
+		else if ("scatter".equals(strType)) series.setType(ChartSeriesBean.TYPE_SCATTER);
+		else if ("scatte".equals(strType)) series.setType(ChartSeriesBean.TYPE_SCATTER);
+		else if ("step".equals(strType)) series.setType(ChartSeriesBean.TYPE_STEP);
+
+		else throw CFMLEngineFactory.getInstance().getExceptionUtil()
+				.createApplicationException("invalid value [" + strType + "] for attribute type, for this attribute only the following values are supported "
+						+ "[area, bar, cone, curve, cylinder, horizontalbar, line,pie,pyramid,scatter,step,timeline]");
 	}
+
 	/**
 	 * @param valueColumn the valueColumn to set
 	 */
 	public void setValuecolumn(String valueColumn) {
-		this.valueColumn=valueColumn;
+		this.valueColumn = valueColumn;
 	}
 
 	public void addChartData(ChartDataBean data) {
 		series.addChartData(data);
 	}
-	
 
 	@Override
-	public int doStartTag()	{
+	public int doStartTag() {
 		return EVAL_BODY_INCLUDE;
 	}
 
 	@Override
-	public int doEndTag() throws JspException {
+	public int doEndTag() throws PageException {
 
 		ChartDataBean data;
-		
-		if(query!=null) {
+
+		if (query != null) {
 			CFMLEngine engine = CFMLEngineFactory.getInstance();
-			if(Util.isEmpty(itemColumn)) throw engine.getExceptionUtil().createApplicationException("attribute itemColumn is required for tag cfchartseries when attribute query is defined");
-			if(Util.isEmpty(valueColumn)) throw engine.getExceptionUtil().createApplicationException("attribute valueColumn is required for tag cfchartseries when attribute query is defined");
+			if (Util.isEmpty(itemColumn))
+				throw engine.getExceptionUtil().createApplicationException("attribute itemColumn is required for tag cfchartseries when attribute query is defined");
+			if (Util.isEmpty(valueColumn))
+				throw engine.getExceptionUtil().createApplicationException("attribute valueColumn is required for tag cfchartseries when attribute query is defined");
 			Object val;
 			int rowCount = query.getRecordcount();
-			for(int i=1;i<=rowCount;i++) {
-				data=new ChartDataBean();
+			for (int i = 1; i <= rowCount; i++) {
+				data = new ChartDataBean();
 				val = query.getAt(valueColumn, i, new Double(0));
-				double d=val==null || (val instanceof String && Util.isEmpty((String)val))?0d:engine.getCastUtil().toDoubleValue(val);
+				double d = val == null || (val instanceof String && Util.isEmpty((String) val)) ? 0d : engine.getCastUtil().toDoubleValue(val);
 				data.setValue(d);
-				data.setItem(pageContext,query.getAt(itemColumn, i, ""));
-				//data.setItem(itemToString(query.getAt(itemColumn, i, "")));
+				data.setItem(pageContext, query.getAt(itemColumn, i, ""));
+				// data.setItem(itemToString(query.getAt(itemColumn, i, "")));
 				addChartData(data);
 			}
 		}
 		// get parent chart
-		Tag parent=this;
-		do{
+		Tag parent = this;
+		do {
 			parent = parent.getParent();
-			if(parent instanceof Chart) {
-				((Chart)parent).addChartSeries(series);
+			if (parent instanceof Chart) {
+				((Chart) parent).addChartSeries(series);
 				break;
 			}
 		}
-		while(parent!=null);
+		while (parent != null);
 		return EVAL_PAGE;
 	}
 }

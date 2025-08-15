@@ -19,9 +19,7 @@
  **/
 package org.lucee.extension.chart.tag;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.Tag;
-
+import jakarta.servlet.jsp.tagext.Tag;
 import lucee.loader.engine.CFMLEngine;
 import lucee.loader.engine.CFMLEngineFactory;
 import lucee.loader.util.Util;
@@ -33,80 +31,81 @@ import lucee.runtime.exp.PageException;
  */
 public abstract class TagImpl implements Tag {
 
-	protected transient PageContext pageContext; 
+	protected transient PageContext pageContext;
 	private transient Tag parent;
 	private transient CFMLEngine eng;
-	
 
-	public CFMLEngine eng(){
-		if(eng==null) eng=CFMLEngineFactory.getInstance();
+	public CFMLEngine eng() {
+		if (eng == null) eng = CFMLEngineFactory.getInstance();
 		return eng;
 	}
-	   
+
 	/**
 	 * sets a PageContext
+	 * 
 	 * @param pageContext
 	 */
 	public void setPageContext(PageContext pageContext) {
-		this.pageContext=pageContext;
+		this.pageContext = pageContext;
 	}
+
 	@Override
-	public void setPageContext(javax.servlet.jsp.PageContext pageContext) {
-		this.pageContext=(PageContext) pageContext;
+	public void setPageContext(jakarta.servlet.jsp.PageContext pageContext) {
+		this.pageContext = (PageContext) pageContext;
 	}
 
 	@Override
 	public void setParent(Tag parent) {
-        this.parent=parent;
+		this.parent = parent;
 	}
 
 	@Override
 	public Tag getParent() {
-        return parent;
+		return parent;
 	}
 
 	@Override
-	public int doStartTag() throws JspException {
+	public int doStartTag() throws PageException {
 		return SKIP_BODY;
 	}
 
 	@Override
-	public int doEndTag() throws JspException {
+	public int doEndTag() throws PageException {
 		return EVAL_PAGE;
 	}
 
 	@Override
 	public void release() {
-		pageContext=null;
-		parent=null;
-		eng=null;
-	}    
-	
+		pageContext = null;
+		parent = null;
+		eng = null;
+	}
+
 	/**
 	 * check if value is not empty
+	 * 
 	 * @param tagName
 	 * @param attributeName
 	 * @param attribute
-	 * @throws ApplicationException
 	 */
 	public void required(String tagName, String actionName, String attributeName, Object attribute) throws PageException {
-	    if(attribute==null)
-	        throw eng().getExceptionUtil().createApplicationException("Attribute ["+attributeName+"] for tag ["+tagName+"] is required if attribute action has the value ["+actionName+"]");
-    
+		if (attribute == null) throw eng().getExceptionUtil()
+				.createApplicationException("Attribute [" + attributeName + "] for tag [" + tagName + "] is required if attribute action has the value [" + actionName + "]");
+
 	}
+
 	public void required(String tagName, String attributeName, Object attribute) throws PageException {
-	    if(attribute==null)
-	        throw eng().getExceptionUtil().createApplicationException("Attribute ["+attributeName+"] for tag ["+tagName+"] is required");
-    
+		if (attribute == null) throw eng().getExceptionUtil().createApplicationException("Attribute [" + attributeName + "] for tag [" + tagName + "] is required");
+
 	}
-	
-	public void required(String tagName, String actionName, String attributeName, String attribute,boolean trim) throws PageException {
-	    if(Util.isEmpty(attribute,trim))
-	        throw eng().getExceptionUtil().createApplicationException("Attribute ["+attributeName+"] for tag ["+tagName+"] is required if attribute action has the value ["+actionName+"]");
-    }
-	
+
+	public void required(String tagName, String actionName, String attributeName, String attribute, boolean trim) throws PageException {
+		if (Util.isEmpty(attribute, trim)) throw eng().getExceptionUtil()
+				.createApplicationException("Attribute [" + attributeName + "] for tag [" + tagName + "] is required if attribute action has the value [" + actionName + "]");
+	}
+
 	public void required(String tagName, String actionName, String attributeName, double attributeValue, double nullValue) throws PageException {
-	    if(attributeValue==nullValue)
-	        throw eng().getExceptionUtil().createApplicationException("Attribute ["+attributeName+"] for tag ["+tagName+"] is required if attribute action has the value ["+actionName+"]");
-    }	
+		if (attributeValue == nullValue) throw eng().getExceptionUtil()
+				.createApplicationException("Attribute [" + attributeName + "] for tag [" + tagName + "] is required if attribute action has the value [" + actionName + "]");
+	}
 }

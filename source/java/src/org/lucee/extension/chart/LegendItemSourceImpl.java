@@ -25,7 +25,7 @@ public class LegendItemSourceImpl implements LegendItemSource {
 
 	@Override
 	public LegendItemCollection getLegendItems() {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
