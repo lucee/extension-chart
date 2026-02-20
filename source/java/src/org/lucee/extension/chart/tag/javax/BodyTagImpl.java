@@ -1,5 +1,6 @@
 /**
  *
+ * Copyright (c) 2015, Lucee Assosication Switzerland
  * Copyright (c) 2014, the Railo Company Ltd. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -16,48 +17,36 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  * 
  **/
-package org.lucee.extension.chart.tag;
+package org.lucee.extension.chart.tag.javax;
 
-import jakarta.servlet.jsp.tagext.Tag;
-import lucee.runtime.exp.PageException;
+import javax.servlet.jsp.tagext.BodyContent;
+import javax.servlet.jsp.tagext.BodyTag;
 
-public final class Chartdata extends TagImpl {
+/**
+ * Implementation of the Tag
+ */
+public abstract class BodyTagImpl extends TagImpl implements BodyTag {
 
-	private ChartDataBean data = new ChartDataBean();
+	protected BodyContent bodyContent = null;
+
+	@Override
+	public void setBodyContent(BodyContent bodyContent) {
+		this.bodyContent = bodyContent;
+	}
+
+	@Override
+	public void doInitBody() {
+
+	}
+
+	@Override
+	public int doAfterBody() {
+		return SKIP_BODY;
+	}
 
 	@Override
 	public void release() {
 		super.release();
-		data = new ChartDataBean();
-	}
-
-	/**
-	 * @param item the item to set
-	 */
-	public void setItem(String item) {
-		data.setItem(item);
-	}
-
-	/**
-	 * @param value the value to set
-	 */
-	public void setValue(double value) {
-		data.setValue(value);
-	}
-
-	@Override
-	public int doStartTag() throws PageException {
-
-		// print.out("do start tag");
-		Tag parent = this;
-		do {
-			parent = parent.getParent();
-			if (parent instanceof Chartseries) {
-				((Chartseries) parent).addChartData(data);
-				break;
-			}
-		}
-		while (parent != null);
-		return SKIP_BODY;
+		bodyContent = null;
 	}
 }

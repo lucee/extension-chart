@@ -16,7 +16,7 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  * 
  **/
-package org.lucee.extension.chart.tag;
+package org.lucee.extension.chart.tag.javax;
 
 import java.awt.Color;
 import java.io.Serializable;
@@ -37,7 +37,7 @@ public class ChartSeriesBean implements Serializable {
 	public static final int PAINT_STYLE_RAISE = 1;
 	public static final int PAINT_STYLE_SHADE = 2;
 	public static final int PAINT_STYLE_LIGHT = 3;
-	
+
 	public static final int TYPE_BAR = 0;
 	public static final int TYPE_LINE = 1;
 	public static final int TYPE_PYRAMID = 2;
@@ -57,40 +57,43 @@ public class ChartSeriesBean implements Serializable {
 	public static final int DATA_LABEL_STYLE_COLUMNLABEL = 3;
 	public static final int DATA_LABEL_STYLE_PATTERN = 4;
 
-	private Color[] colorlist=null;
-	private int markerStyle=MARKER_STYLE_RECTANGLE;
-	private int paintStyle=PAINT_STYLE_PLAIN;
+	private Color[] colorlist = null;
+	private int markerStyle = MARKER_STYLE_RECTANGLE;
+	private int paintStyle = PAINT_STYLE_PLAIN;
 	private Color seriesColor;
 	private String seriesLabel;
-	private int type=TYPE_BAR;
-	private int dataLabelStyle=DATA_LABEL_STYLE_NONE;
-	private java.util.List datas=new ArrayList();
+	private int type = TYPE_BAR;
+	private int dataLabelStyle = DATA_LABEL_STYLE_NONE;
+	private java.util.List datas = new ArrayList();
+
 	/**
 	 * @return the colorlist
 	 */
 	public Color[] getColorlist() {
-		if(colorlist==null) return new Color[0];
+		if (colorlist == null) return new Color[0];
 		return colorlist;
 	}
+
 	/**
 	 * @param colorlist the colorlist to set
 	 */
 	public void setColorlist(Color[] colorlist) {
 		this.colorlist = colorlist;
 	}
+
 	/**
 	 * @return the dataLabelStyle
 	 */
 	public int getDataLabelStyle() {
 		return dataLabelStyle;
 	}
+
 	/**
 	 * @param dataLabelStyle the dataLabelStyle to set
 	 */
 	public void setDataLabelStyle(int dataLabelStyle) {
 		this.dataLabelStyle = dataLabelStyle;
 	}
-	
 
 	/**
 	 * @return the markerStyle
@@ -98,68 +101,79 @@ public class ChartSeriesBean implements Serializable {
 	public int getMarkerStyle() {
 		return markerStyle;
 	}
+
 	/**
 	 * @param markerStyle the markerStyle to set
 	 */
 	public void setMarkerStyle(int markerStyle) {
 		this.markerStyle = markerStyle;
 	}
+
 	/**
 	 * @return the paintStyle
 	 */
 	public int getPaintStyle() {
 		return paintStyle;
 	}
+
 	/**
 	 * @param paintStyle the paintStyle to set
 	 */
 	public void setPaintStyle(int paintStyle) {
 		this.paintStyle = paintStyle;
 	}
+
 	/**
 	 * @return the seriesColor
 	 */
 	public Color getSeriesColor() {
 		return seriesColor;
 	}
+
 	/**
 	 * @param seriesColor the seriesColor to set
 	 */
 	public void setSeriesColor(Color seriesColor) {
 		this.seriesColor = seriesColor;
 	}
+
 	/**
 	 * @return the seriesLabel
 	 */
 	public String getSeriesLabel() {
 		return seriesLabel;
 	}
+
 	/**
 	 * @param seriesLabel the seriesLabel to set
 	 */
 	public void setSeriesLabel(String seriesLabel) {
 		this.seriesLabel = seriesLabel;
 	}
+
 	/**
 	 * @return the type
 	 */
 	public int getType() {
 		return type;
 	}
+
 	/**
 	 * @param type the type to set
 	 */
 	public void setType(int type) {
 		this.type = type;
 	}
+
 	public void addChartData(ChartDataBean data) {
 		datas.add(data);
 	}
+
 	/**
 	 * @return the datas
 	 */
 	public java.util.List getDatas() {
 		return datas;
 	}
-	
+
 }

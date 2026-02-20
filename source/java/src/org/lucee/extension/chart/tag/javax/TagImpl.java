@@ -17,9 +17,10 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  * 
  **/
-package org.lucee.extension.chart.tag;
+package org.lucee.extension.chart.tag.javax;
 
-import jakarta.servlet.jsp.tagext.Tag;
+import javax.servlet.jsp.tagext.Tag;
+
 import lucee.loader.engine.CFMLEngine;
 import lucee.loader.engine.CFMLEngineFactory;
 import lucee.loader.util.Util;
@@ -50,8 +51,8 @@ public abstract class TagImpl implements Tag {
 	}
 
 	@Override
-	public void setPageContext(jakarta.servlet.jsp.PageContext pageContext) {
-		this.pageContext = (PageContext) pageContext;
+	public void setPageContext(javax.servlet.jsp.PageContext pageContext) {
+		this.pageContext = CFMLEngineFactory.getInstance().getThreadPageContext();
 	}
 
 	@Override
@@ -65,12 +66,12 @@ public abstract class TagImpl implements Tag {
 	}
 
 	@Override
-	public int doStartTag() throws PageException {
+	public int doStartTag() {
 		return SKIP_BODY;
 	}
 
 	@Override
-	public int doEndTag() throws PageException {
+	public int doEndTag() {
 		return EVAL_PAGE;
 	}
 
