@@ -735,9 +735,17 @@ public final class Chart extends BodyTagImpl implements Serializable {
 				copy(baos, jfc, info);
 			}
 
-			String contextPath = pageContext.getHttpServletRequest().getContextPath();
-			contextPath = Util.isEmpty(contextPath) ? "/" : contextPath + "/";
-			src = contextPath + "lucee/graph.cfm?img=" + id + "&type=" + formatToString(format);
+			try {
+				// necessary because "getHttpServletRequest" returning a javax based object
+				Object request = pageContext.getClass().getMethod("getHttpServletRequest").invoke(pageContext);
+				String contextPath = (String) request.getClass().getMethod("getContextPath").invoke(request);
+				contextPath = Util.isEmpty(contextPath) ? "/" : contextPath + "/";
+				src = contextPath + "lucee/graph.cfm?img=" + id + "&type=" + formatToString(format);
+			}
+			catch (Exception e) {
+				throw eng().getCastUtil().toPageException(e);
+			}
+
 		}
 		if (!Util.isEmpty(source)) {
 			pageContext.setVariable(source, src);

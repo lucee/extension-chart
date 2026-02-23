@@ -18,9 +18,6 @@
   <property name="fld" location="source/fld"/>
   
 
-  
-  <buildnumber file="build.number"/>
-
   <path id="classpath">
     <fileset dir="${lib}">
       <include name="**/*.jar" />
