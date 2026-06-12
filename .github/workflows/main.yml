@@ -123,10 +123,17 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          if [[ "${{ needs.setup.outputs.version }}" == *-SNAPSHOT ]]; then
+          VERSION="${{ needs.setup.outputs.version }}"
+          EXT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://repo1.maven.org/maven2/org/lucee/chart-extension/${VERSION}/chart-extension-${VERSION}.pom")
+          LIB_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://repo1.maven.org/maven2/org/lucee/chart/${VERSION}/chart-${VERSION}.pom")
+
+          if [[ "$EXT_STATUS" == "200" && "$LIB_STATUS" == "200" ]]; then
+            echo "------- Version ${VERSION} already published, Maven Install only -------";
+            mvn -B -e -f pom.xml clean install -Dgoal=install --settings maven-settings.xml
+          elif [[ "$VERSION" == *-SNAPSHOT ]]; then
             echo "------- Maven Deploy snapshot on ${{ github.event_name }} -------";
             mvn -B -e -f pom.xml clean deploy -Dgoal=deploy --settings maven-settings.xml
-          elif [[ "${{ needs.setup.outputs.version }}" == *-ALPHA ]]; then
+          elif [[ "$VERSION" == *-ALPHA ]]; then
             echo "------- Maven Install alpha on ${{ github.event_name }} -------";
             mvn -B -e -f pom.xml clean install -Dgoal=install --settings maven-settings.xml
           else

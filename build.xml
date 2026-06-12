@@ -23,10 +23,20 @@
             <equals arg1="${maven.goal}" arg2="deploy"/>
         </condition>
 
+        <exec executable="bash" outputproperty="lib.pom.status" failonerror="false" failifexecutionfails="false">
+            <arg value="-c"/>
+            <arg value="curl -s -o /dev/null -w '%{http_code}' https://repo1.maven.org/maven2/${mvnGroupPath}/${mvnArtifactId}/${bundleversion}/${mvnArtifactId}-${bundleversion}.pom"/>
+        </exec>
+        <exec executable="bash" outputproperty="ext.pom.status" failonerror="false" failifexecutionfails="false">
+            <arg value="-c"/>
+            <arg value="curl -s -o /dev/null -w '%{http_code}' https://repo1.maven.org/maven2/org/lucee/chart-extension/${bundleversion}/chart-extension-${bundleversion}.pom"/>
+        </exec>
+
         <condition property="artifact.exists">
             <and>
                 <equals arg1="${is.deploy}" arg2="true"/>
-                <http url="https://repo1.maven.org/maven2/${mvnGroupPath}/${mvnArtifactId}/${bundleversion}/${mvnArtifactId}-${bundleversion}.pom"/>
+                <equals arg1="${lib.pom.status}" arg2="200"/>
+                <equals arg1="${ext.pom.status}" arg2="200"/>
             </and>
         </condition>
 
@@ -34,9 +44,16 @@
             <equals arg1="${artifact.exists}" arg2="true"/>
         </condition>
 
+        <condition property="effective.performRelease" value="false" else="${is.deploy}">
+            <equals arg1="${effective.goal}" arg2="install"/>
+        </condition>
+
         <echo>goal:${maven.goal}</echo>
         <echo>effective.goal:${effective.goal}</echo>
-        <echo>performRelease:${is.deploy}</echo>
+        <echo>performRelease:${effective.performRelease}</echo>
+        <echo>lib.pom.status:${lib.pom.status}</echo>
+        <echo>ext.pom.status:${ext.pom.status}</echo>
+        <echo>artifact.exists:${artifact.exists}</echo>
         <echo>groupId:${mvnGroupId}</echo>
         <echo>groupPath:${mvnGroupPath}</echo>
         <echo>artifactId:${mvnArtifactId}</echo>
@@ -46,7 +63,7 @@
             <arg value="clean"/>
             <arg value="${effective.goal}"/>
             <arg value="-Drevision=${bundleversion}"/>
-            <arg value="-DperformRelease=${is.deploy}"/>
+            <arg value="-DperformRelease=${effective.performRelease}"/>
             <arg value="-e"/>
             <arg value="--settings"/>
             <arg value="maven-settings.xml"/>
