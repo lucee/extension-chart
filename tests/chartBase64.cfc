@@ -7,27 +7,31 @@
 */
 component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 
-	private struct defaultChartAttrs = {
-		format      : "png",
-		chartWidth  : 200,
-		chartHeight : 150,
-		showtooltip : false,
-		name        : "local.chartResult"
-	};
+	private function getDefaultChartAttrs() {
+		return {
+			format      : "png",
+			chartWidth  : 200,
+			chartHeight : 150,
+			showtooltip : false,
+			name        : "local.chartResult"
+		};
+	}
 
-	private array sampleData = [
-		{ item: "Apples",  value: 50 },
-		{ item: "Oranges", value: 75 },
-		{ item: "Pears",   value: 30 }
-	];
+	private function getSampleData() {
+		return [
+			{ item: "Apples",  value: 50 },
+			{ item: "Oranges", value: 75 },
+			{ item: "Pears",   value: 30 }
+		];
+	}
 
 	private function renderChart( required string type, struct attrs={} ) {
-		var chartAttrs = duplicate( defaultChartAttrs );
+		var chartAttrs = getDefaultChartAttrs();
 		structAppend( chartAttrs, arguments.attrs, true );
 
 		cfchart( argumentCollection=chartAttrs ) {
 			cfchartseries( type=arguments.type ) {
-				for ( var point in sampleData ) {
+				for ( var point in getSampleData() ) {
 					cfchartdata( item=point.item, value=point.value );
 				}
 			}
@@ -113,7 +117,7 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 			}
 
 			it( "renders time series chart as valid PNG", function(){
-				cfchart( argumentCollection=defaultChartAttrs ) {
+				cfchart( argumentCollection=getDefaultChartAttrs() ) {
 					cfchartseries( type="time" ) {
 						cfchartdata( item="2024-01-01", value=10 );
 						cfchartdata( item="2024-02-01", value=25 );
@@ -124,7 +128,7 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 			});
 
 			it( "renders multiple bar series as valid PNG", function(){
-				cfchart( argumentCollection=defaultChartAttrs, showLegend=true ) {
+				cfchart( argumentCollection=getDefaultChartAttrs(), showLegend=true ) {
 					cfchartseries( type="bar", seriesLabel="East" ) {
 						cfchartdata( item="Q1", value=40 );
 						cfchartdata( item="Q2", value=55 );
@@ -233,7 +237,7 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 
 			it( "throws when no cfchartseries is provided", function(){
 				expect( function(){
-					cfchart( argumentCollection=defaultChartAttrs ) {};
+					cfchart( argumentCollection=getDefaultChartAttrs() ) {};
 				} ).toThrow();
 			});
 
