@@ -7,16 +7,6 @@
 */
 component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 
-	private function getDefaultChartAttrs() {
-		return {
-			format      : "png",
-			chartWidth  : 200,
-			chartHeight : 150,
-			showtooltip : false,
-			name        : "local.chartResult"
-		};
-	}
-
 	private function getSampleData() {
 		return [
 			{ item: "Apples",  value: 50 },
@@ -26,16 +16,46 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 	}
 
 	private function renderChart( required string type, struct attrs={} ) {
-		var chartAttrs = getDefaultChartAttrs();
-		structAppend( chartAttrs, arguments.attrs, true );
+		var format      = structKeyExists( arguments.attrs, "format" ) ? arguments.attrs.format : "png";
+		var chartWidth  = structKeyExists( arguments.attrs, "chartWidth" ) ? arguments.attrs.chartWidth : 200;
+		var chartHeight = structKeyExists( arguments.attrs, "chartHeight" ) ? arguments.attrs.chartHeight : 150;
+		var showtooltip = structKeyExists( arguments.attrs, "showtooltip" ) ? arguments.attrs.showtooltip : false;
+		var hasBorder   = structKeyExists( arguments.attrs, "showBorder" );
+		var has3D       = structKeyExists( arguments.attrs, "show3D" );
 
-		cfchart( argumentCollection=chartAttrs ) {
-			cfchartseries( type=arguments.type ) {
-				for ( var point in getSampleData() ) {
-					cfchartdata( item=point.item, value=point.value );
+		if ( hasBorder && has3D ) {
+			cfchart( format=format, chartWidth=chartWidth, chartHeight=chartHeight, showtooltip=showtooltip, name="local.chartResult", showBorder=arguments.attrs.showBorder, show3D=arguments.attrs.show3D ) {
+				cfchartseries( type=arguments.type ) {
+					for ( var point in getSampleData() ) {
+						cfchartdata( item=point.item, value=point.value );
+					}
 				}
-			}
-		};
+			};
+		} else if ( hasBorder ) {
+			cfchart( format=format, chartWidth=chartWidth, chartHeight=chartHeight, showtooltip=showtooltip, name="local.chartResult", showBorder=arguments.attrs.showBorder ) {
+				cfchartseries( type=arguments.type ) {
+					for ( var point in getSampleData() ) {
+						cfchartdata( item=point.item, value=point.value );
+					}
+				}
+			};
+		} else if ( has3D ) {
+			cfchart( format=format, chartWidth=chartWidth, chartHeight=chartHeight, showtooltip=showtooltip, name="local.chartResult", show3D=arguments.attrs.show3D ) {
+				cfchartseries( type=arguments.type ) {
+					for ( var point in getSampleData() ) {
+						cfchartdata( item=point.item, value=point.value );
+					}
+				}
+			};
+		} else {
+			cfchart( format=format, chartWidth=chartWidth, chartHeight=chartHeight, showtooltip=showtooltip, name="local.chartResult" ) {
+				cfchartseries( type=arguments.type ) {
+					for ( var point in getSampleData() ) {
+						cfchartdata( item=point.item, value=point.value );
+					}
+				}
+			};
+		}
 
 		return local.chartResult;
 	}
@@ -117,7 +137,7 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 			}
 
 			it( "renders time series chart as valid PNG", function(){
-				cfchart( argumentCollection=getDefaultChartAttrs() ) {
+				cfchart( format="png", chartWidth=200, chartHeight=150, showtooltip=false, name="local.chartResult" ) {
 					cfchartseries( type="time" ) {
 						cfchartdata( item="2024-01-01", value=10 );
 						cfchartdata( item="2024-02-01", value=25 );
@@ -128,7 +148,7 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 			});
 
 			it( "renders multiple bar series as valid PNG", function(){
-				cfchart( argumentCollection=getDefaultChartAttrs(), showLegend=true ) {
+				cfchart( format="png", chartWidth=200, chartHeight=150, showtooltip=false, showLegend=true, name="local.chartResult" ) {
 					cfchartseries( type="bar", seriesLabel="East" ) {
 						cfchartdata( item="Q1", value=40 );
 						cfchartdata( item="Q2", value=55 );
@@ -237,7 +257,7 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 
 			it( "throws when no cfchartseries is provided", function(){
 				expect( function(){
-					cfchart( argumentCollection=getDefaultChartAttrs() ) {};
+					cfchart( format="png", chartWidth=200, chartHeight=150, showtooltip=false, name="local.chartResult" ) {};
 				} ).toThrow();
 			});
 
