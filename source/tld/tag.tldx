@@ -19,8 +19,8 @@
 	<!-- Chart -->
 	<tag>
 		<name>chart</name>
-		<tag-class bundle-name="{bundle-name}" bundle-version="{bundle-version}">org.lucee.extension.chart.tag.jakarta.Chart</tag-class>
-		<javax-tag-class bundle-name="{bundle-name}" bundle-version="{bundle-version}">org.lucee.extension.chart.tag.javax.Chart</javax-tag-class>
+		<tag-class maven="{maven}">org.lucee.extension.chart.tag.jakarta.Chart</tag-class>
+		<javax-tag-class maven="{maven}">org.lucee.extension.chart.tag.javax.Chart</javax-tag-class>
 		<body-content>free</body-content>
 		<body-rtexprvalue>false</body-rtexprvalue>
 		<description>Generates and displays a chart.</description>
@@ -370,8 +370,8 @@
 	<!-- Chartdata -->
 	<tag>
 		<name>chartdata</name>
-		<tag-class bundle-name="{bundle-name}" bundle-version="{bundle-version}">org.lucee.extension.chart.tag.jakarta.Chartdata</tag-class>
-		<javax-tag-class bundle-name="{bundle-name}" bundle-version="{bundle-version}">org.lucee.extension.chart.tag.javax.Chartdata</javax-tag-class>
+		<tag-class maven="{maven}">org.lucee.extension.chart.tag.jakarta.Chartdata</tag-class>
+		<javax-tag-class maven="{maven}">org.lucee.extension.chart.tag.javax.Chartdata</javax-tag-class>
 		<tte>parent:chartseries</tte>
 		<body-content>empty</body-content>
 		<body-rtexprvalue>false</body-rtexprvalue>
@@ -399,8 +399,8 @@
 	<!-- Chartseries -->
 	<tag>
 		<name>chartseries</name>
-		<tag-class bundle-name="{bundle-name}" bundle-version="{bundle-version}">org.lucee.extension.chart.tag.jakarta.Chartseries</tag-class>
-		<javax-tag-class bundle-name="{bundle-name}" bundle-version="{bundle-version}">org.lucee.extension.chart.tag.javax.Chartseries</javax-tag-class>
+		<tag-class maven="{maven}">org.lucee.extension.chart.tag.jakarta.Chartseries</tag-class>
+		<javax-tag-class maven="{maven}">org.lucee.extension.chart.tag.javax.Chartseries</javax-tag-class>
 		<tte>parent:chart</tte>
 		<body-content>free</body-content>
 		<body-rtexprvalue>false</body-rtexprvalue>

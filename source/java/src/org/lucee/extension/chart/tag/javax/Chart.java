@@ -34,11 +34,13 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.TimeZone;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.Axis;
 import org.jfree.chart.axis.AxisLocation;
@@ -54,7 +56,7 @@ import org.jfree.chart.plot.PiePlot3D;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.category.BarRenderer3D;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -64,7 +66,6 @@ import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.urls.PieURLGenerator;
 import org.jfree.chart.urls.StandardCategoryURLGenerator;
 import org.jfree.chart.urls.StandardXYURLGenerator;
-import org.jfree.chart.urls.URLUtilities;
 import org.jfree.data.Range;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -76,12 +77,11 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.HorizontalAlignment;
-import org.jfree.ui.RectangleAnchor;
-import org.jfree.ui.RectangleEdge;
-import org.jfree.ui.RectangleInsets;
-import org.jfree.util.ShapeUtilities;
-import org.lucee.extension.chart.BarRenderer3DWrap;
+import org.jfree.chart.ui.HorizontalAlignment;
+import org.jfree.chart.ui.RectangleAnchor;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.util.ShapeUtils;
 import org.lucee.extension.chart.CategoryToolTipGeneratorImpl;
 import org.lucee.extension.chart.LabelFormatUtil;
 import org.lucee.extension.chart.PieSectionLabelGeneratorImpl;
@@ -415,7 +415,9 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	}
 
 	public void setShowborder(Object showborder) throws PageException {
-		if (eng().getDecisionUtil().isCastableToBoolean(showborder)) this.showborder = eng().getCastUtil().toBooleanValue(showborder);
+		if (eng().getDecisionUtil().isCastableToBoolean(showborder)) {
+			this.showborder = eng().getCastUtil().toBooleanValue(showborder);
+		}
 		else {
 			color = eng().getCastUtil().toColor(showborder);
 			this.showborder = true;
@@ -542,7 +544,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 		Font _font = getFont();
 		pp.setLegendLabelGenerator(new PieSectionLegendLabelGeneratorImpl(_font, chartwidth));
-		pp.setBaseSectionOutlinePaint(Color.GRAY); // rand der st_cke
+		pp.setDefaultSectionOutlinePaint(Color.GRAY); // rand der st_cke
 		pp.setLegendItemShape(new Rectangle(7, 7));
 		pp.setLabelFont(new Font(font, 0, 11));
 		pp.setLabelLinkPaint(COLOR_333333);
@@ -587,9 +589,10 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			plot.setForegroundAlpha(0.8f);
 			CategoryPlot cp = (CategoryPlot) plot;
 			CategoryItemRenderer renderer = cp.getRenderer();
-			if (renderer instanceof BarRenderer3D) {
-				BarRenderer3D br3d = (BarRenderer3D) renderer;
-				cp.setRenderer(new BarRenderer3DWrap(br3d, xoffset, yoffset));
+			if (renderer instanceof BarRenderer) {
+				BarRenderer br = (BarRenderer) renderer;
+				br.setShadowXOffset(xoffset * 100);
+				br.setShadowYOffset(yoffset * 100);
 			}
 
 		}
@@ -664,8 +667,14 @@ public final class Chart extends BodyTagImpl implements Serializable {
 	}
 
 	private void setBorder(JFreeChart chart, Plot plot) {
-		chart.setBorderVisible(false);
-		chart.setBorderPaint(foregroundcolor);
+		if (showborder) {
+			chart.setBorderVisible(true);
+			chart.setBorderPaint(color);
+		}
+		else {
+			chart.setBorderVisible(false);
+			chart.setBorderPaint(foregroundcolor);
+		}
 		plot.setOutlinePaint(foregroundcolor);
 	}
 
@@ -760,7 +769,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 				chartIndex++;
 				if (chartIndex < 0) chartIndex = 0;
 				mapName = "chart_" + chartIndex;
-				String map = ChartUtilities.getImageMap(mapName, info).trim();
+				String map = ChartUtils.getImageMap(mapName, info).trim();
 				pageContext.write(map);
 				pageContext.write("<img border=\"0\" usemap=\"#" + mapName + "\" src=\"" + src + "\">");
 			}
@@ -785,15 +794,8 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			else {
 				bi = jfc.createBufferedImage(chartwidth, chartheight, info);
 			}
-			// add border
-			if (showborder) {
-				try {
-					bi = ImageUtil.addBorder(bi, 1, color);
-				}
-				catch (PageException e) {}
-			}
-			if (format == FORMAT_PNG) ChartUtilities.writeBufferedImageAsPNG(os, bi);
-			else if (format == FORMAT_JPG) ChartUtilities.writeBufferedImageAsJPEG(os, bi);
+			if (format == FORMAT_PNG) ChartUtils.writeBufferedImageAsPNG(os, bi);
+			else if (format == FORMAT_JPG) ChartUtils.writeBufferedImageAsJPEG(os, bi);
 			else if (format == FORMAT_GIF) {
 				ImageUtil.writeOut(bi, os);
 				// throw new ApplicationException("format gif not supported");
@@ -813,15 +815,8 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		if (format != FORMAT_PNG) throw eng().getExceptionUtil().createApplicationException("Only PNG format supported for base64");
 
 		BufferedImage bi = jfc.createBufferedImage(chartwidth, chartheight, info);
-		// add border
-		if (showborder) {
-			try {
-				bi = ImageUtil.addBorder(bi, 1, color);
-			}
-			catch (PageException e) {}
-		}
 
-		byte[] imageBytes = ChartUtilities.encodeAsPNG(bi);
+		byte[] imageBytes = ChartUtils.encodeAsPNG(bi);
 		return Base64.getEncoder().encodeToString(imageBytes);
 	}
 
@@ -846,7 +841,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 	private void chartBar() throws PageException, IOException {
 		// create the chart...
-		final JFreeChart chart = show3d ? ChartFactory.createBarChart3D(title, xaxistitle, yaxistitle, createDatasetCategory(), PlotOrientation.VERTICAL, false, true, false)
+		final JFreeChart chart = show3d ? ChartFactory.createBarChart(title, xaxistitle, yaxistitle, createDatasetCategory(), PlotOrientation.VERTICAL, false, true, false)
 				: ChartFactory.createBarChart(title, xaxistitle, yaxistitle, createDatasetCategory(), PlotOrientation.VERTICAL, false, true, false);
 		Plot p = chart.getPlot();
 		Font _font = getFont();
@@ -868,7 +863,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 	private void chartLine() throws PageException, IOException {
 		// create the chart...
-		final JFreeChart chart = show3d ? ChartFactory.createLineChart3D(title, xaxistitle, yaxistitle, createDatasetCategory(), PlotOrientation.VERTICAL, false, true, false)
+		final JFreeChart chart = show3d ? ChartFactory.createLineChart(title, xaxistitle, yaxistitle, createDatasetCategory(), PlotOrientation.VERTICAL, false, true, false)
 				: ChartFactory.createLineChart(title, xaxistitle, yaxistitle, createDatasetCategory(), PlotOrientation.VERTICAL, false, true, false);
 		Plot p = chart.getPlot();
 		Font _font = getFont();
@@ -935,7 +930,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 	private void chartHorizontalBar() throws PageException, IOException {
 		// create the chart...
-		final JFreeChart chart = show3d ? ChartFactory.createBarChart3D(title, xaxistitle, yaxistitle, createDatasetCategory(), PlotOrientation.HORIZONTAL, false, true, false)
+		final JFreeChart chart = show3d ? ChartFactory.createBarChart(title, xaxistitle, yaxistitle, createDatasetCategory(), PlotOrientation.HORIZONTAL, false, true, false)
 				: ChartFactory.createBarChart(title, xaxistitle, yaxistitle, createDatasetCategory(), PlotOrientation.HORIZONTAL, false, true, false);
 		final CategoryPlot p = chart.getCategoryPlot();
 		p.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
@@ -1010,8 +1005,8 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			XYItemRenderer r = xyp.getRenderer();
 			if (r instanceof XYLineAndShapeRenderer) {
 				XYLineAndShapeRenderer xyr = (XYLineAndShapeRenderer) r;
-				xyr.setBaseShapesVisible(true);
-				xyr.setBaseShapesFilled(true);
+				xyr.setDefaultShapesVisible(true);
+				xyr.setDefaultShapesFilled(true);
 
 				int seriesCount = _series.size();
 				for (int i = 0; i < seriesCount; i++) {
@@ -1019,13 +1014,13 @@ public final class Chart extends BodyTagImpl implements Serializable {
 					xyr.setSeriesShapesVisible(i, true);
 					xyr.setSeriesItemLabelsVisible(i, true);
 					if (markerStyle == ChartSeriesBean.MARKER_STYLE_CIRCLE) xyr.setSeriesShape(i, new Ellipse2D.Double(-markersize / 2, -markersize / 2, markersize, markersize));
-					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_TRIANGLE) xyr.setSeriesShape(i, ShapeUtilities.createUpTriangle(markersize));
-					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_DIAMOND) xyr.setSeriesShape(i, ShapeUtilities.createDiamond(markersize));
+					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_TRIANGLE) xyr.setSeriesShape(i, ShapeUtils.createUpTriangle(markersize));
+					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_DIAMOND) xyr.setSeriesShape(i, ShapeUtils.createDiamond(markersize));
 					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_MCROSS || markerStyle == ChartSeriesBean.MARKER_STYLE_RCROSS)
-						xyr.setSeriesShape(i, ShapeUtilities.createDiagonalCross(markersize, 1));
+						xyr.setSeriesShape(i, ShapeUtils.createDiagonalCross(markersize, 1));
 					else xyr.setSeriesShape(i, new Rectangle2D.Double(-markersize / 2, -markersize / 2, markersize, markersize));
 					xyr.setUseFillPaint(true);
-					xyr.setBaseFillPaint(databackgroundcolor);
+					xyr.setDefaultFillPaint(databackgroundcolor);
 				}
 			}
 		}
@@ -1041,13 +1036,13 @@ public final class Chart extends BodyTagImpl implements Serializable {
 					lsr.setSeriesShapesVisible(i, true);
 					lsr.setSeriesItemLabelsVisible(i, true);
 					if (markerStyle == ChartSeriesBean.MARKER_STYLE_CIRCLE) lsr.setSeriesShape(i, new Ellipse2D.Double(-markersize / 2, -markersize / 2, markersize, markersize));
-					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_TRIANGLE) lsr.setSeriesShape(i, ShapeUtilities.createUpTriangle(markersize));
-					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_DIAMOND) lsr.setSeriesShape(i, ShapeUtilities.createDiamond(markersize));
+					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_TRIANGLE) lsr.setSeriesShape(i, ShapeUtils.createUpTriangle(markersize));
+					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_DIAMOND) lsr.setSeriesShape(i, ShapeUtils.createDiamond(markersize));
 					else if (markerStyle == ChartSeriesBean.MARKER_STYLE_MCROSS || markerStyle == ChartSeriesBean.MARKER_STYLE_RCROSS)
-						lsr.setSeriesShape(i, ShapeUtilities.createDiagonalCross(markersize, 1));
+						lsr.setSeriesShape(i, ShapeUtils.createDiagonalCross(markersize, 1));
 					else lsr.setSeriesShape(i, new Rectangle2D.Double(-markersize / 2, -markersize / 2, markersize, markersize));
 					lsr.setUseFillPaint(true);
-					lsr.setBaseFillPaint(databackgroundcolor);
+					lsr.setDefaultFillPaint(databackgroundcolor);
 				}
 			}
 		}
@@ -1090,11 +1085,11 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		else if (plot instanceof CategoryPlot) {
 			CategoryPlot cp = (CategoryPlot) plot;
 			CategoryItemRenderer renderer = cp.getRenderer();
-			renderer.setBaseToolTipGenerator(new CategoryToolTipGeneratorImpl(labelFormat));
+			renderer.setDefaultToolTipGenerator(new CategoryToolTipGeneratorImpl(labelFormat));
 		}
 		/*
 		 * else if(plot instanceof XYPlot) { XYPlot cp=(XYPlot) plot; XYItemRenderer renderer =
-		 * cp.getRenderer(); renderer.setBaseToolTipGenerator(new XYToolTipGeneratorImpl(labelFormat)); }
+		 * cp.getRenderer(); renderer.setDefaultToolTipGenerator(new XYToolTipGeneratorImpl(labelFormat)); }
 		 */
 
 	}
@@ -1109,9 +1104,9 @@ public final class Chart extends BodyTagImpl implements Serializable {
 				public String generateURL(PieDataset dataset, Comparable key, int pieIndex) {
 					Strings util = eng().getStringUtil();
 					if (url == null || !url.contains("?")) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
-					String retUrl = util.replace(url, "$ITEMLABEL$", URLUtilities.encode(key.toString(), "UTF-8"), false, true);
+					String retUrl = util.replace(url, "$ITEMLABEL$", URLEncoder.encode(key.toString(), StandardCharsets.UTF_8), false, true);
 					retUrl = util.replace(retUrl, "$SERIESLABEL$", Integer.toString(pieIndex), false, true);
-					retUrl = util.replace(retUrl, "$VALUE$", URLUtilities.encode(dataset.getValue(key).toString(), "UTF-8"), false, true);
+					retUrl = util.replace(retUrl, "$VALUE$", URLEncoder.encode(dataset.getValue(key).toString(), StandardCharsets.UTF_8), false, true);
 					return retUrl;
 				}
 			});
@@ -1119,14 +1114,14 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		else if (plot instanceof CategoryPlot) {
 			CategoryPlot cp = (CategoryPlot) plot;
 			CategoryItemRenderer renderer = cp.getRenderer();
-			renderer.setBaseItemURLGenerator(new StandardCategoryURLGenerator() {
+			renderer.setDefaultItemURLGenerator(new StandardCategoryURLGenerator() {
 				@Override
 				public String generateURL(CategoryDataset dataset, int series, int category) {
 					Strings util = eng().getStringUtil();
 					if (url == null || !url.contains("?")) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
-					String retUrl = util.replace(url, "$ITEMLABEL$", URLUtilities.encode(dataset.getColumnKey(category).toString(), "UTF-8"), false, true);
-					retUrl = util.replace(retUrl, "$SERIESLABEL$", URLUtilities.encode(dataset.getRowKey(series).toString(), "UTF-8"), false, true);
-					retUrl = util.replace(retUrl, "$VALUE$", URLUtilities.encode(dataset.getValue(series, category).toString(), "UTF-8"), false, true);
+					String retUrl = util.replace(url, "$ITEMLABEL$", URLEncoder.encode(dataset.getColumnKey(category).toString(), StandardCharsets.UTF_8), false, true);
+					retUrl = util.replace(retUrl, "$SERIESLABEL$", URLEncoder.encode(dataset.getRowKey(series).toString(), StandardCharsets.UTF_8), false, true);
+					retUrl = util.replace(retUrl, "$VALUE$", URLEncoder.encode(dataset.getValue(series, category).toString(), StandardCharsets.UTF_8), false, true);
 					return retUrl;
 				}
 			});
@@ -1140,9 +1135,9 @@ public final class Chart extends BodyTagImpl implements Serializable {
 					Strings util = eng().getStringUtil();
 					if (url == null || !url.contains("?")) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
 					String itemLabel = _plotItemLables.get(category + 1) != null ? _plotItemLables.get(category + 1) : dataset.getX(series, category).toString();
-					String retUrl = util.replace(url, "$ITEMLABEL$", URLUtilities.encode(itemLabel, "UTF-8"), false, true);
-					retUrl = util.replace(retUrl, "$SERIESLABEL$", URLUtilities.encode(dataset.getSeriesKey(series).toString(), "UTF-8"), false, true);
-					retUrl = util.replace(retUrl, "$VALUE$", URLUtilities.encode(dataset.getY(series, category).toString(), "UTF-8"), false, true);
+					String retUrl = util.replace(url, "$ITEMLABEL$", URLEncoder.encode(itemLabel, StandardCharsets.UTF_8), false, true);
+					retUrl = util.replace(retUrl, "$SERIESLABEL$", URLEncoder.encode(dataset.getSeriesKey(series).toString(), StandardCharsets.UTF_8), false, true);
+					retUrl = util.replace(retUrl, "$VALUE$", URLEncoder.encode(dataset.getY(series, category).toString(), StandardCharsets.UTF_8), false, true);
 					return retUrl;
 				}
 			});
@@ -1208,7 +1203,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			rangeAxis.setAutoTickUnitSelection(true);
 			rangeAxis.setStandardTickUnits(new TickUnitsImpl(rangeAxis.getStandardTickUnits(), labelFormat));
 			CategoryItemRenderer r = cp.getRenderer();
-			r.setBaseItemLabelsVisible(false);
+			r.setDefaultItemLabelsVisible(false);
 
 			CategoryAxis da = cp.getDomainAxis();
 			if (!showXLabel) da.setTickLabelsVisible(false);
@@ -1222,7 +1217,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			rangeAxis.setAutoTickUnitSelection(true);
 			rangeAxis.setStandardTickUnits(new TickUnitsImpl(rangeAxis.getStandardTickUnits(), labelFormat));
 			XYItemRenderer r = cp.getRenderer();
-			r.setBaseItemLabelsVisible(false);
+			r.setDefaultItemLabelsVisible(false);
 			ValueAxis da = cp.getDomainAxis();
 			if (!_plotItemLables.isEmpty()) {
 				_plotItemLables.add(0, "");
@@ -1379,7 +1374,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			datas = csb.getDatas();
 			if (sortxaxis) Collections.sort(datas);
 			itt = datas.iterator();
-			TimeSeries ts = new TimeSeries(label, Second.class);
+			TimeSeries ts = new TimeSeries(label);
 			while (itt.hasNext()) {
 				cdb = (ChartDataBean) itt.next();
 				if (smallest > cdb.getValue()) smallest = cdb.getValue();

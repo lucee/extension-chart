@@ -1,16 +1,66 @@
 /**
-* extensive.cfchart.tests.ChartSpec
+* cfchart extension tests
 *
-* These tests cover various aspects of the Lucee <cfchart> tag.
-* Focus is on error-free generation, output format validation,
-* data source handling, and attribute usage. Visual verification
-* is outside the scope of automated unit tests.
+* Covers chart generation, output formats, chart types, and key attributes.
+* Visual appearance is not asserted; tests validate error-free rendering and
+* output structure (signatures, dimensions where meaningful).
 */
 component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 
+	private struct defaultChartAttrs = {
+		format      : "png",
+		chartWidth  : 200,
+		chartHeight : 150,
+		showtooltip : false,
+		name        : "local.chartResult"
+	};
+
+	private array sampleData = [
+		{ item: "Apples",  value: 50 },
+		{ item: "Oranges", value: 75 },
+		{ item: "Pears",   value: 30 }
+	];
+
+	private function renderChart( required string type, struct attrs={} ) {
+		var chartAttrs = duplicate( defaultChartAttrs );
+		structAppend( chartAttrs, arguments.attrs, true );
+
+		cfchart( argumentCollection=chartAttrs ) {
+			cfchartseries( type=arguments.type ) {
+				for ( var point in sampleData ) {
+					cfchartdata( item=point.item, value=point.value );
+				}
+			}
+		};
+
+		return local.chartResult;
+	}
+
+	private function assertPngBinary( required any data ) {
+		expect( isBinary( arguments.data ) ).toBeTrue();
+		expect( len( arguments.data ) ).toBeGT( 0 );
+
+		var hex = binaryEncode( arguments.data, "hex" );
+		expect( left( hex, 16 ) ).toBe( "89504E470D0A1A0A" );
+	}
+
+	private function assertPngBase64( required string data ) {
+		expect( len( arguments.data ) ).toBeGT( 0 );
+		expect( left( arguments.data, 11 ) ).toBe( "iVBORw0KGgo" );
+		assertPngBinary( toBinary( arguments.data ) );
+	}
+
+	private function getImageSize( required any data ) {
+		var img = imageNew( arguments.data );
+		return {
+			width  : imageGetWidth( img ),
+			height : imageGetHeight( img )
+		};
+	}
+
 	function run( testResults , testBox ) {
 
-		describe( "test base 64 rendering", function(){
+		describe( "base64 rendering", function(){
 
 			it( "base64 as data url", function(){
 				savecontent variable="local.chartOutput" {
@@ -21,7 +71,7 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 						};
 					};
 				};
-				expect( local.chartOutput ).toInclude("data:image/png;base64");
+				expect( local.chartOutput ).toInclude( "data:image/png;base64" );
 			});
 
 			it( "base64 as name", function(){
@@ -31,35 +81,164 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 						cfchartdata( item="Oranges", value=75 );
 					};
 				};
-				
-				// Verify it's a valid base64 string
-				expect( isDefined("local.chart") ).toBeTrue();
-				expect( len(local.chart) ).toBeGT( 0 );
-				
-				// Check if it starts with the PNG base64 signature
-				// PNG files always start with these bytes: 89 50 4E 47 0D 0A 1A 0A
-				// In base64, this becomes: iVBORw0KGgo
-				expect( left(local.chart, 11) ).toBe( "iVBORw0KGgo" );
-				
-				// decode base64 and check PNG signature
-				var decoded = toBinary(local.chart);
-				var binaryStr = binaryEncode(decoded, "hex");
-				
-				// PNG signature in hex: 89504E470D0A1A0A
-				expect( left(binaryStr, 16) ).toBe( "89504E470D0A1A0A" );
+
+				expect( isDefined( "local.chart" ) ).toBeTrue();
+				assertPngBase64( local.chart );
 			});
 
 			it( "throws an error when not png", function(){
-				expect(function(){
+				expect( function(){
 					cfchart( format="jpeg", chartWidth=300, chartHeight=200, base64=true ) {
 						cfchartseries( type="bar" ) {
 							cfchartdata( item="Apples", value=50 );
 							cfchartdata( item="Oranges", value=75 );
 						};
 					};
-				}).toThrow();
+				} ).toThrow();
 			});
 
 		});
+
+		describe( "chart types", function(){
+
+			var supportedTypes = [ "bar", "line", "curve", "area", "horizontalbar", "pie", "scatter", "step" ];
+
+			for ( var chartType in supportedTypes ) {
+				( function( required string type ) {
+					it( "renders #type# chart as valid PNG", function(){
+						var result = renderChart( type );
+						assertPngBinary( result );
+					});
+				} )( chartType );
+			}
+
+			it( "renders time series chart as valid PNG", function(){
+				cfchart( argumentCollection=defaultChartAttrs ) {
+					cfchartseries( type="time" ) {
+						cfchartdata( item="2024-01-01", value=10 );
+						cfchartdata( item="2024-02-01", value=25 );
+						cfchartdata( item="2024-03-01", value=18 );
+					}
+				};
+				assertPngBinary( local.chartResult );
+			});
+
+			it( "renders multiple bar series as valid PNG", function(){
+				cfchart( argumentCollection=defaultChartAttrs, showLegend=true ) {
+					cfchartseries( type="bar", seriesLabel="East" ) {
+						cfchartdata( item="Q1", value=40 );
+						cfchartdata( item="Q2", value=55 );
+					}
+					cfchartseries( type="bar", seriesLabel="West" ) {
+						cfchartdata( item="Q1", value=35 );
+						cfchartdata( item="Q2", value=48 );
+					}
+				};
+				assertPngBinary( local.chartResult );
+			});
+
+			var unsupportedTypes = [ "cone", "cylinder", "pyramid" ];
+
+			for ( var chartType in unsupportedTypes ) {
+				( function( required string type ) {
+					it( "throws for unsupported type #type#", function(){
+						expect( function(){
+							renderChart( type );
+						} ).toThrow();
+					});
+				} )( chartType );
+			}
+
+		});
+
+		describe( "output formats", function(){
+
+			it( "renders JPEG output with valid signature", function(){
+				var result = renderChart( "bar", { format: "jpeg" } );
+				expect( isBinary( result ) ).toBeTrue();
+				expect( left( binaryEncode( result, "hex" ), 4 ) ).toBe( "FFD8" );
+			});
+
+			it( "renders GIF output with valid signature", function(){
+				var result = renderChart( "bar", { format: "gif" } );
+				expect( isBinary( result ) ).toBeTrue();
+				expect( left( binaryEncode( result, "hex" ), 12 ) ).toMatch( "(474946383761|474946383961)" );
+			});
+
+			it( "renders PNG at requested dimensions", function(){
+				var result = renderChart( "bar", { chartWidth: 120, chartHeight: 80 } );
+				var size = getImageSize( result );
+				expect( size.width ).toBe( 120 );
+				expect( size.height ).toBe( 80 );
+			});
+
+		});
+
+		describe( "showBorder", function(){
+
+			it( "renders with boolean showBorder", function(){
+				var result = renderChart( "bar", { showBorder: true, chartWidth: 100, chartHeight: 100 } );
+				assertPngBinary( result );
+
+				var size = getImageSize( result );
+				expect( size.width ).toBe( 100 );
+				expect( size.height ).toBe( 100 );
+			});
+
+			it( "renders with custom color showBorder at requested dimensions", function(){
+				var result = renderChart( "bar", { showBorder: "##FF0000", chartWidth: 100, chartHeight: 100 } );
+				assertPngBinary( result );
+
+				var size = getImageSize( result );
+				expect( size.width ).toBe( 100 );
+				expect( size.height ).toBe( 100 );
+			});
+
+			it( "renders custom color border with base64 output", function(){
+				cfchart( format="png", chartWidth=100, chartHeight=100, base64=true, showBorder="##0000FF", showtooltip=false, name="local.chart" ) {
+					cfchartseries( type="bar" ) {
+						cfchartdata( item="A", value=10 );
+						cfchartdata( item="B", value=20 );
+					}
+				};
+				assertPngBase64( local.chart );
+
+				var size = getImageSize( toBinary( local.chart ) );
+				expect( size.width ).toBe( 100 );
+				expect( size.height ).toBe( 100 );
+			});
+
+		});
+
+		describe( "show3D", function(){
+
+			it( "renders 3D bar chart as valid PNG", function(){
+				var result = renderChart( "bar", { show3D: true } );
+				assertPngBinary( result );
+			});
+
+			it( "renders 3D line chart as valid PNG", function(){
+				var result = renderChart( "line", { show3D: true } );
+				assertPngBinary( result );
+			});
+
+			it( "renders 3D pie chart as valid PNG", function(){
+				var result = renderChart( "pie", { show3D: true } );
+				assertPngBinary( result );
+			});
+
+		});
+
+		describe( "validation", function(){
+
+			it( "throws when no cfchartseries is provided", function(){
+				expect( function(){
+					cfchart( argumentCollection=defaultChartAttrs ) {};
+				} ).toThrow();
+			});
+
+		});
+
 	}
+
 }
