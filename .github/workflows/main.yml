@@ -91,7 +91,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [build-and-test]
+    needs: [setup, build-and-test]
     if: always() && needs.build-and-test.result == 'success'
     steps:
       - name: Checkout repository
@@ -125,8 +125,11 @@ jobs:
         run: |
           if [[ "${{ needs.setup.outputs.version }}" == *-SNAPSHOT ]]; then
             echo "------- Maven Deploy snapshot on ${{ github.event_name }} -------";
-            mvn -B -e -f pom.xml clean deploy --settings maven-settings.xml
+            mvn -B -e -f pom.xml clean deploy -Dgoal=deploy --settings maven-settings.xml
+          elif [[ "${{ needs.setup.outputs.version }}" == *-ALPHA ]]; then
+            echo "------- Maven Install alpha on ${{ github.event_name }} -------";
+            mvn -B -e -f pom.xml clean install -Dgoal=install --settings maven-settings.xml
           else
             echo "------- Maven Deploy release on ${{ github.event_name }} -------";
-            mvn -B -e -f pom.xml clean deploy -DperformRelease=true --settings maven-settings.xml
+            mvn -B -e -f pom.xml clean deploy -Dgoal=deploy -DperformRelease=true --settings maven-settings.xml
           fi
