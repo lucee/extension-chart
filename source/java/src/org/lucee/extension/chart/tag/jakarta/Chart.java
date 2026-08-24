@@ -699,7 +699,14 @@ public final class Chart extends BodyTagImpl implements Serializable {
 		final ChartRenderingInfo info = new ChartRenderingInfo();
 		String src;
 
-		setUrl(jfc);
+		try {
+			setUrl(jfc);
+		}
+		catch (Exception e) {
+			System.err.println("Chart.writeOut() - Error in setUrl(): " + e.getMessage());
+			e.printStackTrace(System.err);
+			throw eng().getCastUtil().toPageException(e);
+		}
 
 		// write out to variable
 		if (!Util.isEmpty(name)) {
@@ -719,27 +726,32 @@ public final class Chart extends BodyTagImpl implements Serializable {
 			src = "data:image/png;base64," + toBase64(jfc, info);
 		}
 		else {
-			// write out as link
-			String id = eng().getSystemUtil().hashMd5(JavaUtil.serialize(this));
-			Resource graph = pageContext.getConfig().getTempDirectory().getRealResource("graph");
-			Resource res = graph.getRealResource(id);
-			if (!res.exists()) {
-				clean(graph);
-				copy(res.getOutputStream(), jfc, info);
-			}
-			else {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				copy(baos, jfc, info);
-			}
-
+			System.err.println("Chart.writeOut() - Starting non-base64 path");
 			try {
+				// write out as link
+				String id = eng().getSystemUtil().hashMd5(JavaUtil.serialize(this));
+				Resource graph = pageContext.getConfig().getTempDirectory().getRealResource("graph");
+				Resource res = graph.getRealResource(id);
+				if (!res.exists()) {
+					clean(graph);
+					copy(res.getOutputStream(), jfc, info);
+				}
+				else {
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					copy(baos, jfc, info);
+				}
+				System.err.println("Chart.writeOut() - Image written, now getting context path");
+
 				// necessary because "getHttpServletRequest" returning a jakarta based object
 				Object request = pageContext.getClass().getMethod("getHttpServletRequest").invoke(pageContext);
 				String contextPath = (String) request.getClass().getMethod("getContextPath").invoke(request);
 				contextPath = Util.isEmpty(contextPath) ? "/" : contextPath + "/";
 				src = contextPath + "lucee/graph.cfm?img=" + id + "&type=" + formatToString(format);
+				System.err.println("Chart.writeOut() - Context path retrieved: " + src);
 			}
 			catch (Exception e) {
+				System.err.println("Chart.writeOut() - Error in non-base64 path: " + e.getMessage());
+				e.printStackTrace(System.err);
 				throw eng().getCastUtil().toPageException(e);
 			}
 		}

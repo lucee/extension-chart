@@ -89,6 +89,15 @@ jobs:
           testLabels: chart
           testAdditional: ${{ github.workspace }}/tests
 
+      - name: Capture Lucee logs on failure
+        if: failure()
+        run: |
+          echo "=== Lucee Error Logs ==="
+          find /home/runner/work/_actions/lucee/script-runner/main/logs -name "*.log" -exec cat {} \;
+          echo ""
+          echo "=== Lucee Server Logs ==="
+          find /home/runner/work/_actions/lucee/script-runner/main/temp/lucee/lucee-server -name "*.log" -o -name "*.txt" | head -20 | xargs -I {} sh -c 'echo "--- {} ---"; cat "{}"'
+
   deploy:
     runs-on: ubuntu-latest
     needs: [build-and-test]
