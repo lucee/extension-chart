@@ -77,14 +77,6 @@ jobs:
           repository: lucee/lucee
           path: lucee
 
-      - name: Check extension file exists
-        run: |
-          echo "Extension directory: ${{ github.workspace }}/target"
-          ls -lah ${{ github.workspace }}/target/*.lex
-          echo ""
-          echo "Contents of target:"
-          ls -lah ${{ github.workspace }}/target/
-
       - name: Run Lucee Test Suite
         uses: lucee/script-runner@main
         with:
@@ -93,31 +85,9 @@ jobs:
           luceeVersion: ${{ matrix.lucee.version }}
           luceeVersionQuery: ${{ matrix.lucee.query }}
           extensionDir: ${{ github.workspace }}/target
-          # keep the temp/log dir so we can read Lucee's real error afterwards
-          postCleanup: false
-          # -v makes Ant echo the captured error property (errorOut) instead of swallowing it
-          antFlags: "-v"
         env:
           testLabels: chart
           testAdditional: ${{ github.workspace }}/tests
-
-      - name: Dump Lucee logs and deploy errors
-        if: always()
-        continue-on-error: true
-        run: |
-          BASE=/home/runner/work/_actions/lucee/script-runner/main
-          echo "=== All log/txt/out/err files under script-runner ==="
-          find "$BASE" -type f \( -name "*.log" -o -name "*.txt" -o -name "*out*" -o -name "*err*" \) 2>/dev/null | sort
-          echo ""
-          echo "=== Lucee server context logs (deploy/application/exception) ==="
-          find "$BASE" -path "*lucee-server/context/logs*" -type f 2>/dev/null | while read f; do
-            echo "----- $f -----"; cat "$f"; echo ""
-          done
-          echo ""
-          echo "=== Every .log file content ==="
-          find "$BASE" -name "*.log" -type f 2>/dev/null | while read f; do
-            echo "----- $f -----"; cat "$f"; echo ""
-          done
 
   deploy:
     runs-on: ubuntu-latest
