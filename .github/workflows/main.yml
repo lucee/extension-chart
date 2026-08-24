@@ -89,14 +89,18 @@ jobs:
           testLabels: chart
           testAdditional: ${{ github.workspace }}/tests
 
-      - name: Capture Lucee logs on failure
-        if: failure()
+      - name: Dump Lucee logs
+        if: always()
+        continue-on-error: true
         run: |
-          echo "=== Lucee Error Logs ==="
-          find /home/runner/work/_actions/lucee/script-runner/main/logs -name "*.log" -exec cat {} \;
+          echo "=== Available log files ==="
+          find /home/runner/work/_actions/lucee/script-runner/main -name "*.log" -o -name "error*" -o -name "out*" 2>/dev/null | sort
           echo ""
-          echo "=== Lucee Server Logs ==="
-          find /home/runner/work/_actions/lucee/script-runner/main/temp/lucee/lucee-server -name "*.log" -o -name "*.txt" | head -20 | xargs -I {} sh -c 'echo "--- {} ---"; cat "{}"'
+          echo "=== Lucee Error Logs ==="
+          find /home/runner/work/_actions/lucee/script-runner/main/logs -type f 2>/dev/null | while read f; do echo "--- $f ---"; cat "$f"; done
+          echo ""
+          echo "=== Lucee Server Context Logs ==="
+          find /home/runner/work/_actions/lucee/script-runner/main/temp/lucee/lucee-server/context -type f 2>/dev/null | while read f; do echo "--- $f ---"; tail -100 "$f"; done
 
   deploy:
     runs-on: ubuntu-latest
