@@ -93,25 +93,31 @@ jobs:
           luceeVersion: ${{ matrix.lucee.version }}
           luceeVersionQuery: ${{ matrix.lucee.query }}
           extensionDir: ${{ github.workspace }}/target
+          # keep the temp/log dir so we can read Lucee's real error afterwards
+          postCleanup: false
+          # -v makes Ant echo the captured error property (errorOut) instead of swallowing it
+          antFlags: "-v"
         env:
           testLabels: chart
           testAdditional: ${{ github.workspace }}/tests
 
-      - name: Debug - Show all files created by script-runner
+      - name: Dump Lucee logs and deploy errors
         if: always()
         continue-on-error: true
         run: |
-          echo "=== Directory structure in script-runner ==="
-          ls -la /home/runner/work/_actions/lucee/script-runner/main/ 2>/dev/null || echo "Directory not found"
+          BASE=/home/runner/work/_actions/lucee/script-runner/main
+          echo "=== All log/txt/out/err files under script-runner ==="
+          find "$BASE" -type f \( -name "*.log" -o -name "*.txt" -o -name "*out*" -o -name "*err*" \) 2>/dev/null | sort
           echo ""
-          echo "=== All files in script-runner (recursive) ==="
-          find /home/runner/work/_actions/lucee/script-runner/main -type f 2>/dev/null | head -50
+          echo "=== Lucee server context logs (deploy/application/exception) ==="
+          find "$BASE" -path "*lucee-server/context/logs*" -type f 2>/dev/null | while read f; do
+            echo "----- $f -----"; cat "$f"; echo ""
+          done
           echo ""
-          echo "=== Content of all .log files ==="
-          find /home/runner/work/_actions/lucee/script-runner/main -name "*.log" -type f 2>/dev/null -exec sh -c 'echo "=== {} ==="; cat "$1"' _ {} \;
-          echo ""
-          echo "=== Content of stdout/stderr if captured ==="
-          find /home/runner/work/_actions/lucee/script-runner/main -name "*out*" -o -name "*err*" -type f 2>/dev/null -exec sh -c 'echo "=== {} ==="; cat "$1"' _ {} \;
+          echo "=== Every .log file content ==="
+          find "$BASE" -name "*.log" -type f 2>/dev/null | while read f; do
+            echo "----- $f -----"; cat "$f"; echo ""
+          done
 
   deploy:
     runs-on: ubuntu-latest
