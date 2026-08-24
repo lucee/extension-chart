@@ -77,6 +77,14 @@ jobs:
           repository: lucee/lucee
           path: lucee
 
+      - name: Check extension file exists
+        run: |
+          echo "Extension directory: ${{ github.workspace }}/target"
+          ls -lah ${{ github.workspace }}/target/*.lex
+          echo ""
+          echo "Contents of target:"
+          ls -lah ${{ github.workspace }}/target/
+
       - name: Run Lucee Test Suite
         uses: lucee/script-runner@main
         with:
