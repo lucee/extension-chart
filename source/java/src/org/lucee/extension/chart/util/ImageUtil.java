@@ -5,20 +5,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 
-import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
-import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageOutputStream;
 
 import lucee.runtime.exp.PageException;
 
 public class ImageUtil {
 
-	private static final int QUALITY = 1;
-
+	/**
+	 * writes the image as GIF, using the GIF writer that comes with the JDK
+	 */
 	public static void writeOut(BufferedImage bi, OutputStream os) throws IOException, PageException {
 		ImageOutputStream ios = ImageIO.createImageOutputStream(os);
 		try {
@@ -34,32 +32,14 @@ public class ImageUtil {
 	}
 
 	private static void _writeOut(BufferedImage im, ImageOutputStream ios) throws IOException, PageException {
-		IIOMetadata meta = null;
-
-		ImageWriter writer = null;
 		ImageTypeSpecifier type = ImageTypeSpecifier.createFromRenderedImage(im);
-		Iterator<ImageWriter> iter = ImageIO.getImageWriters(type, "png");
+		Iterator<ImageWriter> iter = ImageIO.getImageWriters(type, "gif");
+		if (!iter.hasNext()) throw new IOException("no writer for format [gif] found!");
 
-		if (iter.hasNext()) {
-			writer = iter.next();
-		}
-		if (writer == null) throw new IOException("no writer for format [png] found!");
-
-		ImageWriteParam iwp = writer.getDefaultWriteParam();
-
-		try {
-			iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-		}
-		catch (Exception t) {
-		}
-		try {
-			iwp.setCompressionQuality(QUALITY);
-		}
-		catch (Exception t) {
-		}
+		ImageWriter writer = iter.next();
 		writer.setOutput(ios);
 		try {
-			writer.write(meta, new IIOImage(im, null, meta), iwp);
+			writer.write(im);
 		}
 		finally {
 			writer.dispose();
