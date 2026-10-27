@@ -186,12 +186,16 @@ component extends="org.lucee.cfml.test.LuceeTestCase" labels="chart" {
 				expect( left( binaryEncode( result, "hex" ), 4 ) ).toBe( "FFD8" );
 			});
 
-			it( "renders GIF format output as valid binary", function(){
-				var result = renderChart( "bar", { format: "gif" } );
+			it( "renders GIF output with valid signature", function(){
+				var result = renderChart( "bar", { format: "gif", chartWidth: 120, chartHeight: 80 } );
 				expect( isBinary( result ) ).toBeTrue();
 				expect( len( result ) ).toBeGT( 0 );
-				// current implementation encodes GIF requests as PNG
-				assertPngBinary( result );
+				// GIF87a / GIF89a
+				expect( left( binaryEncode( result, "hex" ), 8 ) ).toBe( "47494638" );
+
+				var size = getImageSize( result );
+				expect( size.width ).toBe( 120 );
+				expect( size.height ).toBe( 80 );
 			});
 
 			it( "renders PNG at requested dimensions", function(){
