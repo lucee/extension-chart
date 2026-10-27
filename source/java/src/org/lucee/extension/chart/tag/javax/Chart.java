@@ -34,6 +34,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.TimeZone;
@@ -1096,6 +1097,9 @@ public final class Chart extends BodyTagImpl implements Serializable {
 
 	private void setUrl(JFreeChart chart) {
 		if (Util.isEmpty(url)) return;
+		// a javascript: url or a url with a query string only gets the variables substituted (LDEV-5573)
+		final String urlTemplate = (url.contains("?") || url.trim().toLowerCase(Locale.ROOT).startsWith("javascript:")) ? url
+				: url + "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
 		Plot plot = chart.getPlot();
 		if (plot instanceof PiePlot) {
 			PiePlot pp = (PiePlot) plot;
@@ -1103,8 +1107,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 				@Override
 				public String generateURL(PieDataset dataset, Comparable key, int pieIndex) {
 					Strings util = eng().getStringUtil();
-					if (url == null || !url.contains("?")) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
-					String retUrl = util.replace(url, "$ITEMLABEL$", URLEncoder.encode(key.toString(), StandardCharsets.UTF_8), false, true);
+					String retUrl = util.replace(urlTemplate, "$ITEMLABEL$", URLEncoder.encode(key.toString(), StandardCharsets.UTF_8), false, true);
 					retUrl = util.replace(retUrl, "$SERIESLABEL$", Integer.toString(pieIndex), false, true);
 					retUrl = util.replace(retUrl, "$VALUE$", URLEncoder.encode(dataset.getValue(key).toString(), StandardCharsets.UTF_8), false, true);
 					return retUrl;
@@ -1118,8 +1121,7 @@ public final class Chart extends BodyTagImpl implements Serializable {
 				@Override
 				public String generateURL(CategoryDataset dataset, int series, int category) {
 					Strings util = eng().getStringUtil();
-					if (url == null || !url.contains("?")) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
-					String retUrl = util.replace(url, "$ITEMLABEL$", URLEncoder.encode(dataset.getColumnKey(category).toString(), StandardCharsets.UTF_8), false, true);
+					String retUrl = util.replace(urlTemplate, "$ITEMLABEL$", URLEncoder.encode(dataset.getColumnKey(category).toString(), StandardCharsets.UTF_8), false, true);
 					retUrl = util.replace(retUrl, "$SERIESLABEL$", URLEncoder.encode(dataset.getRowKey(series).toString(), StandardCharsets.UTF_8), false, true);
 					retUrl = util.replace(retUrl, "$VALUE$", URLEncoder.encode(dataset.getValue(series, category).toString(), StandardCharsets.UTF_8), false, true);
 					return retUrl;
@@ -1133,9 +1135,8 @@ public final class Chart extends BodyTagImpl implements Serializable {
 				@Override
 				public String generateURL(XYDataset dataset, int series, int category) {
 					Strings util = eng().getStringUtil();
-					if (url == null || !url.contains("?")) url += "?series=$SERIESLABEL$&category=$ITEMLABEL$&value=$VALUE$";
 					String itemLabel = _plotItemLables.get(category + 1) != null ? _plotItemLables.get(category + 1) : dataset.getX(series, category).toString();
-					String retUrl = util.replace(url, "$ITEMLABEL$", URLEncoder.encode(itemLabel, StandardCharsets.UTF_8), false, true);
+					String retUrl = util.replace(urlTemplate, "$ITEMLABEL$", URLEncoder.encode(itemLabel, StandardCharsets.UTF_8), false, true);
 					retUrl = util.replace(retUrl, "$SERIESLABEL$", URLEncoder.encode(dataset.getSeriesKey(series).toString(), StandardCharsets.UTF_8), false, true);
 					retUrl = util.replace(retUrl, "$VALUE$", URLEncoder.encode(dataset.getY(series, category).toString(), StandardCharsets.UTF_8), false, true);
 					return retUrl;
